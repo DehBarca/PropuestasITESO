@@ -88,6 +88,14 @@
     border-width:0!important;
 }
 
+.nav-link {
+  color: white !important;
+}
+
+.navbar-custom {
+  background-color: #00467F;
+}
+
 .navbar-brand {
     color: white;
 }

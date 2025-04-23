@@ -11,32 +11,18 @@
 </head>
 <body>
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-sm navbar-light bg-primary">
-        <div class="container">
-            <a class="navbar-brand" href="#">
-                <img src="https://images.seeklogo.com/logo-png/45/2/iteso-logo-png_seeklogo-450933.png" alt="" width="40px" height="40px">
-                PropuestasITESO
-            </a>
-            <button
-                class="navbar-toggler d-lg-none"
-                type="button"
-                data-bs-toggle="collapse"
-                data-bs-target="#collapsibleNavId"
-                aria-controls="collapsibleNavId"
-                aria-expanded="false"
-                aria-label="Toggle navigation"
-            >
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="ms-auto">
-                <form class="d-flex my-2 my-lg-0">
-                    <button type="button" class="btn btn-outline-success" id="LogIn" data-bs-toggle="modal" data-bs-target="#login" style="margin-right: 10px;">Log In</button>
-                    <button type="button" class="btn btn-outline-light" id="SignIn" data-bs-toggle="modal" data-bs-target="#register" style="margin-left: 10px;">Sign In</button>
-                </form>
-                
-            </div>
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-custom px-4">
+        <a class="navbar-brand" href="Home.html">
+          <img src="https://images.seeklogo.com/logo-png/45/2/iteso-logo-png_seeklogo-450933.png" alt="ITESO" height="30" />
+          Propuestas ITESO
+        </a>
+        <div class="ms-auto d-flex align-items-center gap-4">
+          <a href="HomeLoggedin.html" class="nav-link"><i class="bi bi-house-door-fill fs-5"></i></a>
+          <a href="Likes.html" class="nav-link"><i class="bi bi-bookmark-fill fs-5"></i></a>
+          <a href="#" class="nav-link"><i class="bi bi-bell fs-5"></i></a>
+          <a href="Perfil.html" class="nav-link"><i class="bi bi-person-circle fs-5"></i></a>
         </div>
-    </nav>
+      </nav>
                  <!-- Login Modal -->
                  <div class="modal fade" id="login" tabindex="-1" data-bs-backdrop="static" aria-labelledby="loginModalLabel" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered">
