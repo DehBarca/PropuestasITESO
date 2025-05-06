@@ -1,0 +1,26 @@
+// Obtener todas las propuestas
+GET http://127.0.0.1:8080/api/propuesta HTTP/1.1
+
+###
+// Añadir una propuesta
+POST http://127.0.0.1:8080/api/propuesta HTTP/1.1
+Content-Type: application/json
+
+{
+    "title": "Test",
+    "category": ["Test"],
+    "descripcion": "Esto es una prueba",
+    "date": "2O25-05-05",
+    "likes": 0,
+    "dislikes": 0,
+    "img": "https://via.placeholder.com/150"
+}
+
+###
+//Eliminar una propuesta por ID
+DELETE http://127.0.0.1:8080/api/propuesta/3452345 HTTP/1.1
+
+###
+// Actualizar una propuesta por ID
+PUT http://127.0.0.1:8080/api/propuesta/3452345 HTTP/1.1
+Content-Type: application/json

@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="https://images.seeklogo.com/logo-png/45/2/iteso-logo-png_seeklogo-450933.png" type="image/x-icon">
+    <title>Propuestas ITESO</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="../CSS/Styles.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-sm navbar-light bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <img src="https://images.seeklogo.com/logo-png/45/2/iteso-logo-png_seeklogo-450933.png" alt="" width="40px" height="40px">
+                PropuestasITESO
+            </a>
+            <button
+                class="navbar-toggler d-lg-none"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#collapsibleNavId"
+                aria-controls="collapsibleNavId"
+                aria-expanded="false"
+                aria-label="Toggle navigation"
+            >
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="ms-auto">
+                <form class="d-flex my-2 my-lg-0">
+                    <button type="button" class="btn btn-outline-success" id="LogIn" data-bs-toggle="modal" data-bs-target="#login" style="margin-right: 10px;">Log In</button>
+                    <button type="button" class="btn btn-outline-light" id="SignIn" data-bs-toggle="modal" data-bs-target="#register" style="margin-left: 10px;">Sign In</button>
+                </form>
+                
+            </div>
+        </div>
+    </nav>
+                 <!-- Login Modal -->
+                 <div class="modal fade" id="login" tabindex="-1" data-bs-backdrop="static" aria-labelledby="loginModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title fs-5" id="loginModalLabel">Iniciar Sesión</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body justify-content-between align-items-center">
+                                <form>
+                                    <div class="form-group">
+                                        <label for="email">Correo electrónico</label>
+                                        <input type="email" class="form-control" id="email" placeholder="abc@gmail.com" required> 
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="password">Contraseña</label>
+                                        <input type="password" class="form-control" id="password" placeholder="Contraseña123" required><br>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center modal-footer">
+                                        <button type="submit" class="btn btn-success">Log In</button>
+                                        <button class="btn btn-primary" data-bs-target="#register" data-bs-toggle="modal">Register</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Register Modal -->
+                <div class="modal fade" id="register" aria-hidden="true" aria-labelledby="register" tabindex="-1">
+                    <div class="modal-dialog modal-dialog-centered">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h1 class="modal-title fs-5" id="exampleModalToggleLabel2">Register</h1>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body justify-content-between align-items-center">
+                          <form>
+                            <div class="mb-3">
+                                <label for="" class="form-label">Name</label>
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    name=""
+                                    id=""
+                                    aria-describedby="helpId"
+                                    placeholder="Pedro Sánchez" required
+                                />
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="" class="form-label">Email</label>
+                                <input
+                                    type="email"
+                                    class="form-control"
+                                    name=""
+                                    id=""
+                                    aria-describedby="emailHelpId"
+                                    placeholder="abc@mail.com" required
+                                />
+                            </div>
+                            <div class="mb-3">
+                                <label for="" class="form-label">Password</label>
+                                <input
+                                    type="password"
+                                    class="form-control"
+                                    name=""
+                                    id=""
+                                    placeholder="papitasricas" required
+                                />
+                            </div>
+                            
+                            
+                         
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center modal-footer">
+                          <button type="submit" class="btn btn-success">Register</button>
+                          <button class="btn btn-primary" data-bs-target="#login" data-bs-toggle="modal">Log In</button>
+                        </div> </form>
+                      </div>
+                    </div>
+                  </div>
+
+    <!-- Search Bar -->
+    <div class="container d-flex align-items-center justify-content-between" id="searchbar">
+        <div class="search-container">
+            <input class="input" type="text" placeholder="Search...">
+            <svg viewBox="0 0 24 24" class="search__icon">
+                <g>
+                    <path d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5-7.5-3.365-7.5-7.5z"></path>
+                </g>
+            </svg>
+        </div>
+    </div>
+
+    <!-- Container de Cards -->
+    <div class="container" id="cards-container">
+        <div class="row">
+            <!-- Card 1 -->
+            <div class="col-md-4">
+                <div class="card">
+                    <img src="https://via.placeholder.com/150" class="card-img-top" alt="Card Image">
+                    <div class="card-body">
+                        <h5 class="card-title">Propuesta 1</h5>
+                        <button class="btn btn-primary btn-sm card-category" disabled>Education</button>
+                        <p class="card-text mt-2">This is a description for propuesta 1.</p>
+                        <div class="d-flex justify-content-between">
+                            <button class="btn btn-outline-success"><i class="bi bi-hand-thumbs-up"></i> Like</button>
+                            <button class="btn btn-outline-danger"><i class="bi bi-hand-thumbs-down"></i> Dislike</button>
+                            <button class="btn btn-outline-primary"><i class="bi bi-chat"></i> Comment</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Card 2 -->
+            <div class="col-md-4">
+                <div class="card">
+                    <img src="https://via.placeholder.com/150" class="card-img-top" alt="Card Image">
+                    <div class="card-body">
+                        <h5 class="card-title">Propuesta 2</h5>
+                        <button class="btn btn-primary btn-sm card-category" disabled>Technology</button>
+                        <p class="card-text mt-2">This is a description for propuesta 2.</p>
+                        <div class="d-flex justify-content-between">
+                            <button class="btn btn-outline-success"><i class="bi bi-hand-thumbs-up"></i> Like</button>
+                            <button class="btn btn-outline-danger"><i class="bi bi-hand-thumbs-down"></i> Dislike</button>
+                            <button class="btn btn-outline-primary"><i class="bi bi-chat"></i> Comment</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Card 3 -->
+            <div class="col-md-4">
+                <div class="card">
+                    <img src="https://via.placeholder.com/150" class="card-img-top" alt="Card Image">
+                    <div class="card-body">
+                        <h5 class="card-title">Propuesta 3</h5>
+                        <button class="btn btn-primary btn-sm card-category" disabled>Environment</button>
+                        <p class="card-text mt-2">This is a description for propuesta 3.</p>
+                        <div class="d-flex justify-content-between">
+                            <button class="btn btn-outline-success"><i class="bi bi-hand-thumbs-up"></i> Like</button>
+                            <button class="btn btn-outline-danger"><i class="bi bi-hand-thumbs-down"></i> Dislike</button>
+                            <button class="btn btn-outline-primary"><i class="bi bi-chat"></i> Comment</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js" integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq" crossorigin="anonymous"></script>
+</body>
+</html>
