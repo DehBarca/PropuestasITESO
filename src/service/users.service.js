@@ -96,6 +96,8 @@ class UserService {
         email: user.email,
         role: user.role,
       });
+
+      return [true, token];
     } catch (error) {
       console.error("Error al validar credenciales. Error: ", error);
     } finally {
