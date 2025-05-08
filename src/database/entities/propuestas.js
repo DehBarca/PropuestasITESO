@@ -1,4 +1,5 @@
 import { Schema, model } from "mongoose";
+import { User } from "./users.js";
 
 const PropuestaSchema = new Schema({
   title: { type: String, required: true },
@@ -8,7 +9,7 @@ const PropuestaSchema = new Schema({
   likes: { type: Schema.Types.Int32, default: 0 },
   dislikes: { type: Schema.Types.Int32, default: 0 },
   img: { type: String },
-  //   autor: { type: Schema.Types.ObjectId, ref: "usuario" }
+  autor: { type: Schema.Types.ObjectId, ref: "User", required: true },
 });
 
 export default model("Propuesta", PropuestaSchema);

@@ -17,7 +17,8 @@ Content-Type: application/json
     "date": "2025-05-05",
     "likes": 0,
     "dislikes": 0,
-    "img": "https://via.placeholder.com/150"
+    "img": "https://via.placeholder.com/150",
+    "autor" : "681c1b5fdb318628c63e6eb5"
 }
 
 ###
@@ -37,3 +38,44 @@ Content-Type: application/json
 ###
 // Eliminar una propuesta por ID
 DELETE http://127.0.0.1:8080/api/propuesta/681ae97085c61b12c725c343 HTTP/1.1
+
+//-------------------------------------------- REQUEST PARA USUARIOS ---------------------------------------------------------------------------
+
+// Obtener todos los usuarios
+GET http://127.0.0.1:8080/api/user HTTP/1.1
+
+###
+// Obtener usuario por ID
+GET http://127.0.0.1:8080/api/user/YOUR_USER_ID HTTP/1.1
+
+###
+// Obtener usuario por email
+GET http://127.0.0.1:8080/api/user/email/test@test.com HTTP/1.1
+
+###
+// Crear nuevo usuario
+POST http://127.0.0.1:8080/api/user HTTP/1.1
+Content-Type: application/json
+
+{
+    "user": "TestUser",
+    "role": "user",
+    "email": "test@test.com",
+    "password": "Password123!"
+}
+
+###
+// Actualizar usuario por ID
+PUT http://127.0.0.1:8080/api/user/YOUR_USER_ID HTTP/1.1
+Content-Type: application/json
+
+{
+    "user": "UpdatedUser",
+    "role": "admin",
+    "email": "updated@test.com",
+    "password": "NewPassword123!"
+}
+
+###
+// Eliminar usuario por ID
+DELETE http://127.0.0.1:8080/api/user/YOUR_USER_ID HTTP/1.1
