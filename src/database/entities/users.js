@@ -1,4 +1,5 @@
 import { Schema, model } from "mongoose";
+import { encriptar } from "../../utils/encrypt.js";
 
 const UserSchema = new Schema({
   user: {
@@ -31,4 +32,20 @@ const UserSchema = new Schema({
   },
 });
 
-export const User = model("User", UserSchema);
+UserSchema.pre("save", async function (next) {
+  try {
+    this.email = String(this.email).toLowerCase();
+    this.password = await encriptar(this.password);
+    next();
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+});
+
+UserSchema.post("save", function (doc) {
+  console.log("Se registro un nuevo usuario.");
+});
+
+const userModel = model("User", UserSchema);
+export const User = userModel;

@@ -9,9 +9,8 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-// Register both routers
 app.use("/api", propuestaRouter);
-app.use("/api", userRouter); // Add this line
+app.use("/api", userRouter);
 
 app.listen(Config.PORT, Config.SERVER, () => {
   console.log(`Servidor corriendo ${Config.SERVER}:${Config.PORT}`);

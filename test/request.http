@@ -11,8 +11,8 @@ POST http://127.0.0.1:8080/api/propuesta HTTP/1.1
 Content-Type: application/json
 
 {
-    "title": "Test Propuesta",
-    "category": ["Test"],
+    "title": "Test 3Propuesta",
+    "category": ["Tes3t"],
     "descripcion": "Esto es una prueba",
     "date": "2025-05-05",
     "likes": 0,
@@ -37,16 +37,18 @@ Content-Type: application/json
 
 ###
 // Eliminar una propuesta por ID
-DELETE http://127.0.0.1:8080/api/propuesta/681ae97085c61b12c725c343 HTTP/1.1
+DELETE http://127.0.0.1:8080/api/propuesta/681c3b58bfbf6c18470603bf HTTP/1.1
 
 //-------------------------------------------- REQUEST PARA USUARIOS ---------------------------------------------------------------------------
+
+###
 
 // Obtener todos los usuarios
 GET http://127.0.0.1:8080/api/user HTTP/1.1
 
 ###
 // Obtener usuario por ID
-GET http://127.0.0.1:8080/api/user/YOUR_USER_ID HTTP/1.1
+GET http://127.0.0.1:8080/api/user/681c1b5fdb318628c63e6eb5 HTTP/1.1
 
 ###
 // Obtener usuario por email
@@ -58,10 +60,10 @@ POST http://127.0.0.1:8080/api/user HTTP/1.1
 Content-Type: application/json
 
 {
-    "user": "TestUser",
-    "role": "user",
-    "email": "test@test.com",
-    "password": "Password123!"
+    "user": "Admin",
+    "role": "admin",
+    "email": "admin@test.com",
+    "password": "Password123234!"
 }
 
 ###
@@ -78,4 +80,4 @@ Content-Type: application/json
 
 ###
 // Eliminar usuario por ID
-DELETE http://127.0.0.1:8080/api/user/YOUR_USER_ID HTTP/1.1
+DELETE http://127.0.0.1:8080/api/user/681c3bb2bfbf6c18470603cc HTTP/1.1

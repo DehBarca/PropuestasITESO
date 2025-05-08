@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import { User } from "../database/entities/users.js";
 import { dbConnect, dbDisconnect } from "../database/connections.js";
+import { crearToken } from "../utils/jwt.js";
 
 class UserService {
   constructor() {}
@@ -71,6 +72,48 @@ class UserService {
       return await User.findByIdAndDelete(id);
     } catch (error) {
       console.error(`No se pudo eliminar el usuario: `, error);
+    } finally {
+      await dbDisconnect();
+    }
+  };
+
+  ingresar = async ({ email, password }) => {
+    try {
+      await dbConnect();
+
+      const user = await User.findOne({ email: email, deleteAt: null });
+      if (!user) {
+        return [false, "No se encontró el email"];
+      }
+
+      const iguales = await comparar(user.password, password);
+      if (!iguales) {
+        return [false, "la contraseña no es válida"];
+      }
+
+      const token = crearToken({
+        id: user._id,
+        email: user.email,
+        role: user.role,
+      });
+    } catch (error) {
+      console.error("Error al validar credenciales. Error: ", error);
+    } finally {
+      await dbDisconnect();
+    }
+  };
+
+  registrar = async (userData) => {
+    try {
+      await dbConnect();
+
+      const user = new User(userData);
+
+      await user.save();
+
+      return true;
+    } catch (error) {
+      console.error("Error al crear al usuario. Error: ", error);
     } finally {
       await dbDisconnect();
     }
