@@ -24,7 +24,8 @@ function actualizarBotones(
 function crearCard(propuesta) {
   const cardDiv = document.createElement("div");
   cardDiv.className = "col-md-4 mb-4";
-  cardDiv.innerHTML = `
+
+  const card = `
     <div class="card h-100">
       <img src="${propuesta.img || "https://via.placeholder.com/150"}" 
            class="card-img-top" 
@@ -42,21 +43,21 @@ function crearCard(propuesta) {
         <p class="card-text">${propuesta.descripcion}</p>
         <div class="mt-auto">
           <div class="d-flex justify-content-between align-items-center">
-            <button class="btn btn-outline-success" onclick="darLike('${
+            <button class="btn btn-outline-success like-btn" data-id="${
               propuesta._id
-            }')">
+            }">
               <i class="bi bi-hand-thumbs-up"></i> 
               <span class="likes-count">${propuesta.likes || 0}</span>
             </button>
-            <button class="btn btn-outline-danger" onclick="darDislike('${
+            <button class="btn btn-outline-danger dislike-btn" data-id="${
               propuesta._id
-            }')">
+            }">
               <i class="bi bi-hand-thumbs-down"></i>
               <span class="dislikes-count">${propuesta.dislikes || 0}</span>
             </button>
-            <button class="btn btn-outline-primary" onclick="mostrarComentarios('${
+            <button class="btn btn-outline-primary comment-btn" data-id="${
               propuesta._id
-            }')">
+            }">
               <i class="bi bi-chat"></i> Comentar
             </button>
           </div>
@@ -64,49 +65,85 @@ function crearCard(propuesta) {
       </div>
     </div>
   `;
+
+  cardDiv.innerHTML = card;
+
+  // Add event listeners
+  cardDiv.querySelector(".like-btn").addEventListener("click", async (e) => {
+    const button = e.currentTarget;
+    const id = button.dataset.id;
+
+    // Disable button temporarily to prevent multiple clicks
+    button.disabled = true;
+
+    try {
+      const response = await fetch(`${API_URL}/api/propuesta/${id}/like`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        mode: "cors",
+        credentials: "include",
+      });
+
+      if (response.ok) {
+        const likesCount = button.querySelector(".likes-count");
+        const currentLikes = parseInt(likesCount.textContent);
+        likesCount.textContent = currentLikes + 1;
+
+        // Visual feedback
+        button.classList.remove("btn-outline-success");
+        button.classList.add("btn-success");
+        setTimeout(() => {
+          button.classList.remove("btn-success");
+          button.classList.add("btn-outline-success");
+        }, 500);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    } finally {
+      button.disabled = false;
+    }
+  });
+
+  cardDiv.querySelector(".dislike-btn").addEventListener("click", async (e) => {
+    const button = e.currentTarget;
+    const id = button.dataset.id;
+
+    // Disable button temporarily to prevent multiple clicks
+    button.disabled = true;
+
+    try {
+      const response = await fetch(`${API_URL}/api/propuesta/${id}/dislike`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        mode: "cors",
+        credentials: "include",
+      });
+
+      if (response.ok) {
+        const dislikesCount = button.querySelector(".dislikes-count");
+        const currentDislikes = parseInt(dislikesCount.textContent);
+        dislikesCount.textContent = currentDislikes + 1;
+
+        // Visual feedback
+        button.classList.remove("btn-outline-danger");
+        button.classList.add("btn-danger");
+        setTimeout(() => {
+          button.classList.remove("btn-danger");
+          button.classList.add("btn-outline-danger");
+        }, 500);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    } finally {
+      button.disabled = false;
+    }
+  });
+
   return cardDiv;
-}
-
-async function darLike(id) {
-  try {
-    const response = await fetch(`${API_URL}/api/propuesta/${id}/like`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      mode: "cors",
-      credentials: "include",
-    });
-    if (response.ok) {
-      const likesElement = document.querySelector(
-        `[onclick="darLike('${id}')"] .likes-count`
-      );
-      likesElement.textContent = parseInt(likesElement.textContent) + 1;
-    }
-  } catch (error) {
-    console.error("Error:", error);
-  }
-}
-
-async function darDislike(id) {
-  try {
-    const response = await fetch(`${API_URL}/api/propuesta/${id}/dislike`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      mode: "cors",
-      credentials: "include",
-    });
-    if (response.ok) {
-      const dislikesElement = document.querySelector(
-        `[onclick="darDislike('${id}')"] .dislikes-count`
-      );
-      dislikesElement.textContent = parseInt(dislikesElement.textContent) + 1;
-    }
-  } catch (error) {
-    console.error("Error:", error);
-  }
 }
 
 document.addEventListener("DOMContentLoaded", async () => {

@@ -35,4 +35,30 @@ router.post("/", async (req, res) => {
   }
 });
 
+router.put("/:id/like", async (req, res) => {
+  try {
+    const result = await service.updateLikes(req.params.id, true);
+    if (result) {
+      res.status(200).json({ success: true });
+    } else {
+      res.status(404).json({ message: "Propuesta not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+router.put("/:id/dislike", async (req, res) => {
+  try {
+    const result = await service.updateLikes(req.params.id, false);
+    if (result) {
+      res.status(200).json({ success: true });
+    } else {
+      res.status(404).json({ message: "Propuesta not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 export default router;
