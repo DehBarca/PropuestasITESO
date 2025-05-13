@@ -16,7 +16,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: "http://127.0.0.1:5500",
+    origin: process.env.CLIENT_URL || "http://127.0.0.1:5500",
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })
@@ -98,4 +98,9 @@ app.use((req, res) => {
 
 app.listen(Config.PORT, Config.SERVER, () => {
   console.log(`Server running at ${Config.SERVER}:${Config.PORT}`);
+});
+
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ error: "Internal Server Error" });
 });

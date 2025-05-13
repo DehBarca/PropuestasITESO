@@ -1,7 +1,9 @@
 {
   "type": "module",
   "scripts": {
-    "start": "nodemon app.js"
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "lint": "eslint ."
   },
   "dependencies": {
     "bcryptjs": "^3.0.2",
