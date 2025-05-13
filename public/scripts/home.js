@@ -21,6 +21,16 @@ function actualizarBotones(
   }
 }
 
+function showMessage(message, isError = false) {
+  const toast = document.createElement("div");
+  toast.className = `alert alert-${
+    isError ? "danger" : "success"
+  } position-fixed bottom-0 end-0 m-3`;
+  toast.textContent = message;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 3000);
+}
+
 function crearCard(propuesta) {
   const cardDiv = document.createElement("div");
   cardDiv.className = "col-md-4 mb-4";
@@ -71,36 +81,36 @@ function crearCard(propuesta) {
   // Add event listeners
   cardDiv.querySelector(".like-btn").addEventListener("click", async (e) => {
     const button = e.currentTarget;
-    const id = button.dataset.id;
-
-    // Disable button temporarily to prevent multiple clicks
     button.disabled = true;
 
     try {
-      const response = await fetch(`${API_URL}/api/propuesta/${id}/like`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        mode: "cors",
-        credentials: "include",
-      });
+      const response = await fetch(
+        `${API_URL}/api/propuesta/${button.dataset.id}/like`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+        }
+      );
 
-      if (response.ok) {
+      const result = await response.json();
+
+      if (response.ok && result.success) {
         const likesCount = button.querySelector(".likes-count");
-        const currentLikes = parseInt(likesCount.textContent);
-        likesCount.textContent = currentLikes + 1;
+        likesCount.textContent = parseInt(likesCount.textContent) + 1;
 
-        // Visual feedback
         button.classList.remove("btn-outline-success");
         button.classList.add("btn-success");
         setTimeout(() => {
           button.classList.remove("btn-success");
           button.classList.add("btn-outline-success");
         }, 500);
+      } else {
+        showMessage(result.message || "Error al procesar la acción", true);
       }
     } catch (error) {
       console.error("Error:", error);
+      showMessage("Error al procesar la acción", true);
     } finally {
       button.disabled = false;
     }

@@ -1,5 +1,6 @@
 import express from "express";
 import PropuestaService from "../service/propuestas.service.js";
+import { checkAuth } from "../middlewares/is.authenticated.js";
 
 const router = express.Router();
 const service = new PropuestaService();
@@ -35,26 +36,30 @@ router.post("/", async (req, res) => {
   }
 });
 
-router.put("/:id/like", async (req, res) => {
+router.put("/:id/like", checkAuth, async (req, res) => {
   try {
-    const result = await service.updateLikes(req.params.id, true);
-    if (result) {
-      res.status(200).json({ success: true });
+    const token = req.cookies.jwt;
+    const result = await service.updateLikes(req.params.id, token, true);
+
+    if (result.success) {
+      res.status(200).json(result);
     } else {
-      res.status(404).json({ message: "Propuesta not found" });
+      res.status(400).json(result);
     }
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 });
 
-router.put("/:id/dislike", async (req, res) => {
+router.put("/:id/dislike", checkAuth, async (req, res) => {
   try {
-    const result = await service.updateLikes(req.params.id, false);
-    if (result) {
-      res.status(200).json({ success: true });
+    const token = req.cookies.jwt;
+    const result = await service.updateLikes(req.params.id, token, false);
+
+    if (result.success) {
+      res.status(200).json(result);
     } else {
-      res.status(404).json({ message: "Propuesta not found" });
+      res.status(400).json(result);
     }
   } catch (error) {
     res.status(500).json({ message: error.message });
