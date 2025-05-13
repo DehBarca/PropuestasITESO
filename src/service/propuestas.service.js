@@ -1,17 +1,32 @@
-import fs from "node:fs";
 import Propuesta from "../database/entities/propuestas.js";
 import { dbConnect, dbDisconnect } from "../database/connections.js";
 
 class PropuestaService {
   constructor() {}
 
-  getPropuestas = async () => {
+  getPropuestas = async (page = 1, limit = 6) => {
     try {
       await dbConnect();
 
-      return await Propuesta.find();
+      const skip = (page - 1) * limit;
+      const [propuestas, total] = await Promise.all([
+        Propuesta.find()
+          .skip(skip)
+          .limit(limit)
+          .populate("autor", "user email")
+          .lean(),
+        Propuesta.countDocuments(),
+      ]);
+
+      return {
+        items: propuestas,
+        totalPages: Math.ceil(total / limit),
+        currentPage: page,
+        totalItems: total,
+      };
     } catch (error) {
-      console.error(`No se pueden econtrar las propuestas: `, error);
+      console.error(`No se pueden encontrar las propuestas: `, error);
+      throw error;
     } finally {
       await dbDisconnect();
     }
@@ -66,6 +81,29 @@ class PropuestaService {
       return true;
     } catch (error) {
       console.error(`No se pudo actualizar la propuesta: `, error);
+      return false;
+    } finally {
+      await dbDisconnect();
+    }
+  };
+
+  updateLikes = async (id, isLike = true) => {
+    try {
+      await dbConnect();
+      const updateField = isLike ? "likes" : "dislikes";
+
+      const result = await Propuesta.findByIdAndUpdate(
+        id,
+        { $inc: { [updateField]: 1 } },
+        { new: true }
+      );
+
+      return result ? true : false;
+    } catch (error) {
+      console.error(
+        `Error al actualizar ${isLike ? "likes" : "dislikes"}: `,
+        error
+      );
       return false;
     } finally {
       await dbDisconnect();

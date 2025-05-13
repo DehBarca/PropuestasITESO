@@ -5,7 +5,7 @@ const router = express.Router();
 const service = new UserService();
 
 // GET all users
-router.get("/user", async (req, res) => {
+router.get("/", async (req, res) => {
   try {
     const users = await service.getUsers();
     res.status(200).json(users);
@@ -15,7 +15,7 @@ router.get("/user", async (req, res) => {
 });
 
 // GET user by ID
-router.get("/user/:id", async (req, res) => {
+router.get("/:id", async (req, res) => {
   try {
     const user = await service.getUserByID(req.params.id);
     if (user) {
@@ -29,7 +29,7 @@ router.get("/user/:id", async (req, res) => {
 });
 
 // GET user by email
-router.get("/user/email/:email", async (req, res) => {
+router.get("/email/:email", async (req, res) => {
   try {
     const user = await service.getUserByEmail(req.params.email);
     if (user) {
@@ -43,7 +43,7 @@ router.get("/user/email/:email", async (req, res) => {
 });
 
 // POST new user
-router.post("/user", async (req, res) => {
+router.post("/", async (req, res) => {
   try {
     const newUser = await service.addUser(req.body);
     res.status(201).json(newUser);
@@ -53,7 +53,7 @@ router.post("/user", async (req, res) => {
 });
 
 // PUT update user
-router.put("/user/:id", async (req, res) => {
+router.put("/:id", async (req, res) => {
   try {
     const updated = await service.updateUser(req.params.id, req.body);
     if (updated) {
@@ -67,7 +67,7 @@ router.put("/user/:id", async (req, res) => {
 });
 
 // DELETE user
-router.delete("/user/:id", async (req, res) => {
+router.delete("/:id", async (req, res) => {
   try {
     const result = await service.deleteUser(req.params.id);
     if (result) {

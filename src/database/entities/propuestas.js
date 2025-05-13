@@ -1,15 +1,42 @@
-import { Schema, model } from "mongoose";
-import { User } from "./users.js";
+import mongoose from "mongoose";
 
-const PropuestaSchema = new Schema({
-  title: { type: String, required: true },
-  category: { type: [String], required: true },
-  descripcion: { type: String, required: true },
-  date: { type: String, default: Date.now },
-  likes: { type: Schema.Types.Int32, default: 0 },
-  dislikes: { type: Schema.Types.Int32, default: 0 },
-  img: { type: String },
-  autor: { type: Schema.Types.ObjectId, ref: "User", required: true },
-});
+const PropuestaSchema = new mongoose.Schema(
+  {
+    title: {
+      type: String,
+      required: true,
+    },
+    category: [
+      {
+        type: String,
+        required: true,
+      },
+    ],
+    descripcion: {
+      type: String,
+      required: true,
+    },
+    likes: {
+      type: Number,
+      default: 0,
+    },
+    dislikes: {
+      type: Number,
+      default: 0,
+    },
+    img: {
+      type: String,
+      default: "https://via.placeholder.com/150",
+    },
+    autor: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
 
-export default model("Propuesta", PropuestaSchema);
+export default mongoose.model("Propuesta", PropuestaSchema);

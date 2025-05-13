@@ -4,16 +4,25 @@ import Config from "./src/config/config.js";
 import propuestaRouter from "./src/routes/propuesta.routes.js";
 import userRouter from "./src/routes/user.routes.js";
 import cookieParser from "cookie-parser";
+import { checkAuth } from "./src/middlewares/is.authenticated.js";
 
 const app = express();
 
+app.use(
+  cors({
+    origin: "http://127.0.0.1:5500", // Specific origin instead of wildcard
+    methods: ["GET", "POST", "PUT", "DELETE"], // Allowed methods
+    allowedHeaders: ["Content-Type", "Accept"], // Allowed headers
+    credentials: true, // Allow credentials
+  })
+);
+
 app.use(express.json());
-app.use(cors());
 app.use(cookieParser());
 
 // Rutas API
 app.use("/api/propuesta", propuestaRouter);
-app.use("/api/auth", userRouter);
+app.use("/api/user", userRouter);
 
 app.get("/login", (req, res) =>
   res.sendFile(import.meta.dirname + "/public/views/login.html")
