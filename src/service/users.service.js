@@ -1,9 +1,9 @@
-import fs from "node:fs";
 import { User } from "../database/entities/users.js";
 import { dbConnect, dbDisconnect } from "../database/connections.js";
+import { encriptar, comparar } from "../utils/encrypt.js";
 import { crearToken } from "../utils/jwt.js";
 
-class UserService {
+export class UserService {
   constructor() {}
 
   getUsers = async () => {
@@ -109,17 +109,64 @@ class UserService {
     try {
       await dbConnect();
 
-      const user = new User(userData);
+      // Verify if email already exists
+      const existingUser = await User.findOne({
+        email: userData.email.toLowerCase(),
+      });
+      if (existingUser) {
+        return { success: false, message: "El email ya está registrado" };
+      }
+
+      const user = new User({
+        user: userData.user, // Changed from userData.nombre to userData.user
+        email: userData.email,
+        password: userData.password,
+        role: "user",
+      });
 
       await user.save();
 
-      return true;
+      const token = crearToken({
+        id: user._id,
+        email: user.email,
+        role: user.role,
+      });
+
+      return { success: true, token };
     } catch (error) {
-      console.error("Error al crear al usuario. Error: ", error);
+      console.error("Error al crear usuario:", error);
+      return { success: false, message: error.message };
+    } finally {
+      await dbDisconnect();
+    }
+  };
+
+  login = async ({ email, password }) => {
+    try {
+      await dbConnect();
+
+      const user = await User.findOne({ email: email.toLowerCase() });
+      if (!user) {
+        return { success: false, message: "Email no encontrado" };
+      }
+
+      const validPassword = await comparar(user.password, password);
+      if (!validPassword) {
+        return { success: false, message: "Contraseña incorrecta" };
+      }
+
+      const token = crearToken({
+        id: user._id,
+        email: user.email,
+        role: user.role,
+      });
+
+      return { success: true, token };
+    } catch (error) {
+      console.error("Error al validar credenciales:", error);
+      return { success: false, message: error.message };
     } finally {
       await dbDisconnect();
     }
   };
 }
-
-export default UserService;

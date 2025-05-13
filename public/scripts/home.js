@@ -31,9 +31,22 @@ function showMessage(message, isError = false) {
   setTimeout(() => toast.remove(), 3000);
 }
 
-function crearCard(propuesta) {
+function crearCard(propuesta, isAdmin = false) {
   const cardDiv = document.createElement("div");
   cardDiv.className = "col-md-4 mb-4";
+
+  const adminControls = isAdmin
+    ? `
+    <div class="mt-2 d-flex justify-content-between">
+      <button class="btn btn-warning btn-sm edit-btn" data-id="${propuesta._id}">
+        <i class="bi bi-pencil"></i> Editar
+      </button>
+      <button class="btn btn-danger btn-sm delete-btn" data-id="${propuesta._id}">
+        <i class="bi bi-trash"></i> Eliminar
+      </button>
+    </div>
+  `
+    : "";
 
   const card = `
     <div class="card h-100">
@@ -71,6 +84,7 @@ function crearCard(propuesta) {
               <i class="bi bi-chat"></i> Comentar
             </button>
           </div>
+          ${adminControls}
         </div>
       </div>
     </div>
@@ -79,6 +93,12 @@ function crearCard(propuesta) {
   cardDiv.innerHTML = card;
 
   // Add event listeners
+  addCardEventListeners(cardDiv, isAdmin);
+
+  return cardDiv;
+}
+
+function addCardEventListeners(cardDiv, isAdmin) {
   cardDiv.querySelector(".like-btn").addEventListener("click", async (e) => {
     const button = e.currentTarget;
     button.disabled = true;
@@ -153,27 +173,56 @@ function crearCard(propuesta) {
     }
   });
 
-  return cardDiv;
+  if (isAdmin) {
+    cardDiv.querySelector(".edit-btn")?.addEventListener("click", handleEdit);
+    cardDiv
+      .querySelector(".delete-btn")
+      ?.addEventListener("click", handleDelete);
+  }
+}
+
+async function handleEdit(e) {
+  const id = e.currentTarget.dataset.id;
+  // Implement edit functionality
+}
+
+async function handleDelete(e) {
+  const id = e.currentTarget.dataset.id;
+  if (confirm("¿Estás seguro de que quieres eliminar esta propuesta?")) {
+    try {
+      const response = await fetch(`${API_URL}/api/propuesta/${id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+
+      if (response.ok) {
+        e.currentTarget.closest(".col-md-4").remove();
+        showMessage("Propuesta eliminada exitosamente");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      showMessage("Error al eliminar la propuesta", true);
+    }
+  }
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
   const btnSiguiente = document.getElementById("btnSiguiente");
   const btnAnterior = document.getElementById("btnAnterior");
+  const searchInput = document.querySelector(".input");
 
+  const isAdmin = window.location.pathname.includes("admin");
   let paginaActual = getPageNumber() ? parseInt(getPageNumber()) : 1;
   let totalPaginas = 1;
+  let searchTimeout;
 
-  const cargarPropuestas = async (paginaActual = 1) => {
+  const cargarPropuestas = async (paginaActual = 1, searchTerm = "") => {
     try {
       const response = await fetch(
-        `${API_URL}/api/propuesta?page=${paginaActual}&limit=6`,
+        `${API_URL}/api/propuesta?page=${paginaActual}&limit=6&search=${encodeURIComponent(
+          searchTerm
+        )}`,
         {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-          mode: "cors",
           credentials: "include",
         }
       );
@@ -186,8 +235,14 @@ document.addEventListener("DOMContentLoaded", async () => {
       const container = document.querySelector("#cards-container .row");
       container.innerHTML = "";
 
+      if (data.items.length === 0) {
+        container.innerHTML =
+          '<div class="col-12 text-center">No se encontraron propuestas</div>';
+        return 0;
+      }
+
       data.items.forEach((propuesta) => {
-        container.appendChild(crearCard(propuesta));
+        container.appendChild(crearCard(propuesta, isAdmin));
       });
 
       return data.totalPages;
@@ -196,17 +251,31 @@ document.addEventListener("DOMContentLoaded", async () => {
       const container = document.querySelector("#cards-container .row");
       container.innerHTML =
         '<div class="col-12 text-center text-danger">Error al cargar las propuestas</div>';
+      return 0;
     }
   };
 
+  // Add search input handler with debounce
+  searchInput.addEventListener("input", (e) => {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(async () => {
+      paginaActual = 1;
+      actualizarURL(1);
+      totalPaginas = await cargarPropuestas(1, e.target.value);
+      actualizarBotones(btnAnterior, btnSiguiente, paginaActual, totalPaginas);
+    }, 300);
+  });
+
+  // Initial load
   totalPaginas = await cargarPropuestas(paginaActual);
   actualizarBotones(btnAnterior, btnSiguiente, paginaActual, totalPaginas);
 
+  // Pagination handlers
   btnSiguiente?.addEventListener("click", async () => {
     if (paginaActual < totalPaginas) {
       paginaActual++;
       actualizarURL(paginaActual);
-      await cargarPropuestas(paginaActual);
+      await cargarPropuestas(paginaActual, searchInput.value);
       actualizarBotones(btnAnterior, btnSiguiente, paginaActual, totalPaginas);
     }
   });
@@ -215,7 +284,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (paginaActual > 1) {
       paginaActual--;
       actualizarURL(paginaActual);
-      await cargarPropuestas(paginaActual);
+      await cargarPropuestas(paginaActual, searchInput.value);
       actualizarBotones(btnAnterior, btnSiguiente, paginaActual, totalPaginas);
     }
   });

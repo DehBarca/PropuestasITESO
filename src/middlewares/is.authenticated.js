@@ -2,31 +2,35 @@ import { request, response } from "express";
 
 import { validarToken, decodeToken } from "../utils/jwt.js";
 
-export const checkAuth = async (req = request, res = response, next) => {
+export const checkAuth = async (req, res, next) => {
   try {
     const token = req.cookies.jwt;
-
     const url = req.originalUrl;
 
-    if (!validarToken(token) && url.includes("api")) {
-      console.log("Sin autorización a la api.");
-      res.status(401).send({ status: 401, error: "Sin autorización." });
-      return;
+    if (!token) {
+      if (url.includes("api")) {
+        return res
+          .status(401)
+          .json({ status: 401, error: "Sin autorización." });
+      } else {
+        return res.redirect("/login.html");
+      }
     }
-    if (!validarToken(token) && !url.includes("api")) {
-      console.log("Aquí.");
-      console.log("Sin autorización a las vistas.");
-      res.redirect("/login");
-      return;
+
+    if (!validarToken(token)) {
+      if (url.includes("api")) {
+        return res.status(401).json({ status: 401, error: "Token inválido." });
+      } else {
+        res.clearCookie("jwt");
+        return res.redirect("/login.html");
+      }
     }
 
     const { payload } = decodeToken(token);
-
-    req.headers["tipo"] = payload.tipo;
-
+    req.headers.role = payload.role;
     next();
   } catch (error) {
-    console.log("Error al validar las credenciales. Error: ", error);
-    res.status(500).send({ status: 500, error: error });
+    console.error("Error al validar las credenciales:", error);
+    res.status(500).json({ status: 500, error: error.message });
   }
 };

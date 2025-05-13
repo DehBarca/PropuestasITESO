@@ -1,5 +1,5 @@
 import express from "express";
-import UserService from "../service/users.service.js";
+import { UserService } from "../service/users.service.js"; // Change to named import
 
 const router = express.Router();
 const service = new UserService();
@@ -45,10 +45,29 @@ router.get("/email/:email", async (req, res) => {
 // POST new user
 router.post("/", async (req, res) => {
   try {
-    const newUser = await service.addUser(req.body);
-    res.status(201).json(newUser);
+    const result = await service.registrar(req.body);
+    if (result.success) {
+      res.cookie("jwt", result.token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 1000 * 60 * 60 * 24, // 24 hours
+      });
+      res.status(201).json({
+        success: true,
+        message: "Usuario registrado exitosamente",
+      });
+    } else {
+      res.status(400).json({
+        success: false,
+        message: result.message || "Error al registrar usuario",
+      });
+    }
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
 });
 

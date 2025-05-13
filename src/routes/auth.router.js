@@ -1,52 +1,60 @@
-import { Router, request, response } from "express";
-
+import express from "express";
 import { UserService } from "../service/users.service.js";
+import { checkAuth } from "../middlewares/is.authenticated.js";
 
-const router = Router();
+const router = express.Router();
+const service = new UserService();
 
-router.post("/login", async (req = request, res = response) => {
+router.post("/login", async (req, res) => {
   try {
-    const { body } = req;
-    const [estatus, data] = await UserService.ingresar(body);
-    if (estatus) {
-      res.cookie("jwt", data, {
-        httpOnly: false,
-        secure: false,
+    const { email, password } = req.body;
+    const result = await service.login({ email, password });
+
+    if (result.success) {
+      res.cookie("jwt", result.token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
         sameSite: "strict",
-        maxAge: 1000 * 60 * 15,
+        maxAge: 1000 * 60 * 60 * 24, // 24 hours
       });
-      const decodedData = { data: { token: data } };
-      res.status(200).send(JSON.stringify(decodedData));
+      res.status(200).json({ success: true, data: { token: result.token } });
     } else {
-      res.status(400).send({ response: data });
+      res.status(400).json({ success: false, message: result.message });
     }
   } catch (error) {
-    res.status(500).send("Error en el servidor. Error: ", error);
+    console.error("Error:", error);
+    res.status(500).json({ success: false, message: "Error en el servidor" });
   }
 });
 
-router.post("/registro", async (req = request, res = response) => {
+router.post("/registro", async (req, res) => {
   try {
-    const { body } = req;
+    const result = await service.registrar(req.body); // Use instance method
 
-    const exito = await UserService.registrar(body);
-
-    if (exito) {
-      res.status(201).send();
+    if (result.success) {
+      res.cookie("jwt", result.token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 1000 * 60 * 60 * 24,
+      });
+      res.status(201).json({ success: true, message: "Registro exitoso" });
     } else {
-      res.status(400).send("No se logro completar el registro");
+      res.status(400).json({ success: false, message: result.message });
     }
   } catch (error) {
-    res.status(500).send("Error en el servidor. Error: ", error);
+    console.error("Error:", error);
+    res.status(500).json({ message: "Error en el servidor" });
   }
 });
 
-router.post("/logout", (req = request, res = response) => {
+router.post("/logout", (req, res) => {
   try {
     res.clearCookie("jwt");
-    res.redirect("login");
+    res.status(200).json({ message: "Sesión cerrada exitosamente" });
   } catch (error) {
-    res.status(500).send("Error en el servidor. Error: ", error);
+    console.error("Error al cerrar sesión:", error);
+    res.status(500).json({ message: "Error al cerrar sesión" });
   }
 });
 

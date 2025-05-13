@@ -7,7 +7,11 @@ const service = new PropuestaService();
 
 router.get("/", async (req, res) => {
   try {
-    const propuestas = await service.getPropuestas();
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 6;
+    const search = req.query.search || "";
+
+    const propuestas = await service.getPropuestas(page, limit, search);
     res.status(200).json(propuestas);
   } catch (error) {
     res.status(500).json({ message: error.message });

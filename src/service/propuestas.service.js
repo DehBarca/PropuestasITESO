@@ -6,18 +6,29 @@ import { decodeToken } from "../utils/jwt.js";
 class PropuestaService {
   constructor() {}
 
-  getPropuestas = async (page = 1, limit = 6) => {
+  getPropuestas = async (page = 1, limit = 6, search = "") => {
     try {
       await dbConnect();
 
       const skip = (page - 1) * limit;
+      let query = {};
+
+      if (search) {
+        query = {
+          $or: [
+            { title: { $regex: search, $options: "i" } },
+            { category: { $regex: search, $options: "i" } },
+          ],
+        };
+      }
+
       const [propuestas, total] = await Promise.all([
-        Propuesta.find()
+        Propuesta.find(query)
           .skip(skip)
           .limit(limit)
           .populate("autor", "user email")
           .lean(),
-        Propuesta.countDocuments(),
+        Propuesta.countDocuments(query),
       ]);
 
       return {
