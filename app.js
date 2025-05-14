@@ -8,11 +8,18 @@ import cookieParser from "cookie-parser";
 import { checkAuth } from "./src/middlewares/is.authenticated.js";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
+import { dbConnect } from "./src/database/connections.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const app = express();
+
+// Conectar a la base de datos al iniciar la app
+dbConnect().catch((err) => {
+  console.error("Error al conectar a la base de datos:", err);
+  process.exit(1);
+});
 
 app.use(
   cors({

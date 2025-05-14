@@ -3,6 +3,21 @@ import { getPageNumber, actualizarURL } from "./utils.js";
 const limite = 6;
 const API_URL = "http://localhost:8080";
 
+let currentUser = null;
+
+// Obtén el usuario actual al cargar la página
+async function getCurrentUser() {
+  try {
+    const res = await fetch("/api/user/me", { credentials: "include" });
+    const data = await res.json();
+    if (data.success && data.user) {
+      currentUser = data.user;
+    }
+  } catch (error) {
+    currentUser = null;
+  }
+}
+
 function actualizarBotones(
   btnAnterior,
   btnSiguiente,
@@ -31,12 +46,23 @@ function showMessage(message, isError = false) {
   setTimeout(() => toast.remove(), 3000);
 }
 
-function crearCard(propuesta, isAdmin = false) {
+function crearCard(propuesta) {
   const cardDiv = document.createElement("div");
   cardDiv.className = "col-md-4 mb-4";
 
-  const adminControls = isAdmin
-    ? `
+  const autorNombre =
+    propuesta.autor && propuesta.autor.user
+      ? propuesta.autor.user
+      : "Autor desconocido";
+
+  // Mostrar controles solo si admin o autor
+  const isAdmin = currentUser && currentUser.role === "admin";
+  const isOwner =
+    currentUser && propuesta.autor && propuesta.autor._id === currentUser.id;
+
+  const adminControls =
+    isAdmin || isOwner
+      ? `
     <div class="mt-2 d-flex justify-content-between">
       <button class="btn btn-warning btn-sm edit-btn" data-id="${propuesta._id}">
         <i class="bi bi-pencil"></i> Editar
@@ -46,7 +72,7 @@ function crearCard(propuesta, isAdmin = false) {
       </button>
     </div>
   `
-    : "";
+      : "";
 
   const card = `
     <div class="card h-100">
@@ -64,6 +90,7 @@ function crearCard(propuesta, isAdmin = false) {
             .join("")}
         </div>
         <p class="card-text">${propuesta.descripcion}</p>
+        <p class="card-text text-muted mb-1"><small>Autor: ${autorNombre}</small></p>
         <div class="mt-auto">
           <div class="d-flex justify-content-between align-items-center">
             <button class="btn btn-outline-success like-btn" data-id="${
@@ -243,6 +270,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   const btnAnterior = document.getElementById("btnAnterior");
   const searchInput = document.querySelector(".input");
 
+  await getCurrentUser();
+
   const isAdmin = window.location.pathname.includes("admin");
   let paginaActual = getPageNumber() ? parseInt(getPageNumber()) : 1;
   let totalPaginas = 1;
@@ -274,7 +303,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
 
       data.items.forEach((propuesta) => {
-        container.appendChild(crearCard(propuesta, isAdmin));
+        container.appendChild(crearCard(propuesta));
       });
 
       return data.totalPages;
