@@ -1,8 +1,75 @@
 import express from "express";
-import { UserService } from "../service/users.service.js"; // Change to named import
+import { UserService } from "../service/users.service.js";
+import { checkAuth } from "../middlewares/is.authenticated.js";
+import { User } from "../database/entities/users.js";
+import mongoose from "mongoose";
+import { decodeToken } from "../utils/jwt.js";
+import { dbConnect, dbDisconnect } from "../database/connections.js";
 
 const router = express.Router();
 const service = new UserService();
+
+// Guardar/Quitar propuesta de favoritos
+router.post("/save/:propuestaId", checkAuth, async (req, res) => {
+  await dbConnect();
+  try {
+    const token = req.cookies.jwt;
+    const { payload } = decodeToken(token); // <-- Cambia aquí
+    const userId = payload.id;
+    const propuestaId = req.params.propuestaId;
+
+    if (!mongoose.Types.ObjectId.isValid(propuestaId)) {
+      return res.status(400).json({ message: "ID de propuesta inválido" });
+    }
+
+    // Usa el modelo directamente para mantener la conexión activa
+    const user = await User.findById(userId);
+    if (!user)
+      return res.status(404).json({ message: "Usuario no encontrado" });
+
+    if (!Array.isArray(user.saved)) {
+      user.saved = [];
+    }
+
+    const index = user.saved.findIndex((id) => id.toString() === propuestaId);
+    let action;
+    if (index >= 0) {
+      user.saved.splice(index, 1);
+      action = "removed";
+    } else {
+      user.saved.push(propuestaId);
+      action = "added";
+    }
+    await user.save();
+    res.json({ success: true, action, saved: user.saved });
+  } catch (error) {
+    console.error("Error en /save/:propuestaId:", error);
+    res.status(500).json({ success: false, message: error.message });
+  } finally {
+    await dbDisconnect();
+  }
+});
+
+// Obtener propuestas guardadas del usuario autenticado
+router.get("/saved", checkAuth, async (req, res) => {
+  await dbConnect();
+  try {
+    const token = req.cookies.jwt;
+    const { payload } = decodeToken(token);
+    const userId = payload.id;
+
+    const user = await User.findById(userId).populate("saved");
+    if (!user)
+      return res.status(404).json({ message: "Usuario no encontrado" });
+
+    res.json({ success: true, saved: user.saved });
+  } catch (error) {
+    console.error("Error en /saved:", error); // <--- Agrega esto
+    res.status(500).json({ success: false, message: error.message });
+  } finally {
+    await dbDisconnect();
+  }
+});
 
 // GET all users
 router.get("/", async (req, res) => {

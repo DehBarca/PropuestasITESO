@@ -49,24 +49,28 @@ async function cargarLikes() {
 
 function crearCard(propuesta) {
   const cardDiv = document.createElement("div");
-  cardDiv.className = "col-md-6 mb-4";
+  cardDiv.className = "col-md-4 mb-4";
   cardDiv.innerHTML = `
-    <div class="card card-light shadow-sm">
-      <div class="card-body">
-        <h5 class="card-title d-flex justify-content-between">
-          ${propuesta.title}
-          <span class="badge bg-success">Proyecto</span>
-        </h5>
+    <div class="card h-100">
+      <img src="${
+        propuesta.img || "https://via.placeholder.com/150"
+      }" class="card-img-top" alt="${propuesta.title}">
+      <div class="card-body d-flex flex-column">
+        <h5 class="card-title">${propuesta.title}</h5>
+        <div class="mb-2">
+          ${(propuesta.category || [])
+            .map(
+              (cat) =>
+                `<button class="btn btn-primary btn-sm card-category me-1 mb-1" disabled>${cat}</button>`
+            )
+            .join("")}
+        </div>
         <p class="card-text">${propuesta.descripcion}</p>
-        <div class="d-flex justify-content-between">
-          <button class="btn btn-outline-success btn-sm">
-            <i class="bi bi-hand-thumbs-up"></i> ${propuesta.likes}
-          </button>
-          <button class="btn btn-outline-danger btn-sm">
-            <i class="bi bi-hand-thumbs-down"></i> ${propuesta.dislikes}
-          </button>
-          <button class="btn btn-outline-primary btn-sm">
-            <i class="bi bi-chat"></i> Comentar
+        <div class="mt-auto">
+          <button class="btn btn-outline-warning save-btn" data-id="${
+            propuesta._id
+          }" title="Guardado" disabled>
+            <i class="bi bi-bookmark-fill"></i> Guardado
           </button>
         </div>
       </div>
@@ -75,4 +79,75 @@ function crearCard(propuesta) {
   return cardDiv;
 }
 
-document.addEventListener("DOMContentLoaded", cargarLikes);
+async function cargarGuardados() {
+  try {
+    const response = await fetch(`${API_URL}/api/user/saved`, {
+      credentials: "include",
+    });
+    const data = await response.json();
+    const container = document.querySelector("#cards-container .row");
+    container.innerHTML = "";
+
+    if (!data.success || !data.saved || data.saved.length === 0) {
+      container.innerHTML =
+        '<div class="col-12 text-center">No tienes propuestas guardadas.</div>';
+      return;
+    }
+
+    data.saved.forEach((propuesta) => {
+      container.appendChild(crearCard(propuesta));
+    });
+  } catch (error) {
+    console.error("Error al cargar guardados:", error);
+    const container = document.querySelector("#cards-container .row");
+    container.innerHTML =
+      '<div class="col-12 text-center text-danger">Error al cargar los guardados.</div>';
+  }
+}
+
+document.addEventListener("DOMContentLoaded", async () => {
+  const container = document.querySelector(".row.mt-4");
+
+  try {
+    const res = await fetch("/api/user/saved", {
+      credentials: "include",
+    });
+    const data = await res.json();
+
+    if (
+      !data.success ||
+      !Array.isArray(data.saved) ||
+      data.saved.length === 0
+    ) {
+      container.innerHTML = `<p class="text-center text-muted">No tienes propuestas guardadas.</p>`;
+      return;
+    }
+
+    container.innerHTML = ""; // Limpiar el contenedor
+
+    data.saved.forEach((propuesta) => {
+      // Ajusta los campos según tu modelo de propuesta
+      const card = document.createElement("div");
+      card.className = "col-md-4 mb-4";
+      card.innerHTML = `
+        <div class="card card-light h-100">
+          <div class="card-body">
+            <h5 class="card-title">${
+              propuesta.titulo || propuesta.title || "Sin título"
+            }</h5>
+            <p class="card-text">${
+              propuesta.descripcion ||
+              propuesta.description ||
+              "Sin descripción"
+            }</p>
+            <!-- Puedes agregar más campos aquí -->
+          </div>
+        </div>
+      `;
+      container.appendChild(card);
+    });
+  } catch (error) {
+    container.innerHTML = `<p class="text-danger">Error al cargar propuestas guardadas.</p>`;
+    console.error(error);
+  }
+});

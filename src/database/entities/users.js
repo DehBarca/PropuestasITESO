@@ -1,5 +1,6 @@
 import { Schema, model } from "mongoose";
 import { encriptar } from "../../utils/encrypt.js";
+import mongoose from "mongoose";
 
 const UserSchema = new Schema({
   user: {
@@ -22,6 +23,7 @@ const UserSchema = new Schema({
     type: String,
     required: true,
   },
+  saved: [{ type: mongoose.Schema.Types.ObjectId, ref: "Propuesta" }],
 });
 
 UserSchema.pre("save", async function (next) {

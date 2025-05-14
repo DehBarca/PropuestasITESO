@@ -83,6 +83,11 @@ function crearCard(propuesta, isAdmin = false) {
             }">
               <i class="bi bi-chat"></i> Comentar
             </button>
+            <button class="btn btn-outline-warning save-btn" data-id="${
+              propuesta._id
+            }" title="Guardar">
+              <i class="bi bi-bookmark"></i>
+            </button>
           </div>
           ${adminControls}
         </div>
@@ -170,6 +175,33 @@ function addCardEventListeners(cardDiv, isAdmin) {
       console.error("Error:", error);
     } finally {
       button.disabled = false;
+    }
+  });
+
+  cardDiv.querySelector(".save-btn").addEventListener("click", async (e) => {
+    const button = e.currentTarget;
+    const propuestaId = button.dataset.id;
+    try {
+      const response = await fetch(`/api/user/save/${propuestaId}`, {
+        method: "POST",
+        credentials: "include",
+      });
+      const result = await response.json();
+      if (result.success) {
+        if (result.action === "added") {
+          button.classList.remove("btn-outline-warning");
+          button.classList.add("btn-warning");
+          button.querySelector("i").classList.remove("bi-bookmark");
+          button.querySelector("i").classList.add("bi-bookmark-fill");
+        } else {
+          button.classList.remove("btn-warning");
+          button.classList.add("btn-outline-warning");
+          button.querySelector("i").classList.remove("bi-bookmark-fill");
+          button.querySelector("i").classList.add("bi-bookmark");
+        }
+      }
+    } catch (error) {
+      console.error("Error al guardar propuesta:", error);
     }
   });
 
