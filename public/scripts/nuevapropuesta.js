@@ -47,13 +47,13 @@ document
     const title = document.getElementById("titulo").value;
     const descripcion = document.getElementById("descripcion").value;
     const category = document.getElementById("categoria").value;
-    const img = document.getElementById("img").value;
+    const img = document.getElementById("img").value.trim();
 
     const propuesta = {
       title,
       descripcion,
       category: [category],
-      img,
+      img: img || undefined, // No envíes string vacío
       autor: userId,
     };
 

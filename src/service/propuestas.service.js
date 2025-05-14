@@ -50,6 +50,9 @@ class PropuestaService {
 
   addPropuesta = async (propuesta) => {
     try {
+      if (!propuesta.img || propuesta.img.trim() === "") {
+        propuesta.img = "https://via.placeholder.com/150";
+      }
       const newPropuesta = new Propuesta(propuesta);
       await newPropuesta.save();
       propuesta.id = newPropuesta._id;
@@ -69,6 +72,9 @@ class PropuestaService {
 
   updatePropuesta = async (id, propuesta) => {
     try {
+      if (!propuesta.img || propuesta.img.trim() === "") {
+        propuesta.img = "https://via.placeholder.com/150";
+      }
       await Propuesta.findByIdAndUpdate(id, propuesta);
       return true;
     } catch (error) {
