@@ -27,14 +27,12 @@ app.use(cookieParser());
 
 // Serve static files
 app.use(express.static(join(__dirname, "public")));
-app.use(express.static(join(__dirname, "public/views")));
 
 // API Routes
 app.use("/api/propuesta", propuestaRouter);
 app.use("/api/user", userRouter);
 app.use("/api/auth", authRouter);
 
-// View Routes
 app.get(["/login", "/login.html"], (req, res) => {
   res.sendFile(join(__dirname, "public/views/login.html"));
 });

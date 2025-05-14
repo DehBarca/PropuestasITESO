@@ -36,8 +36,8 @@ const registrarse = async (nombre, email, password) => {
     if (response.ok && data.success) {
       showMessage("Registro exitoso", false);
       setTimeout(() => {
-        // Change to API_URL for proper redirection
-        window.location.href = `${API_URL}/login`;
+        // Cambiar redirección a login.html
+        window.location.href = "login.html";
       }, 1500);
     } else {
       showMessage(data.message || "Error al registrarse", true);
