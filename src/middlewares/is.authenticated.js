@@ -1,6 +1,7 @@
 import { request, response } from "express";
 
 import { validarToken, decodeToken } from "../utils/jwt.js";
+import { User } from "../database/entities/users.js"; // importa el modelo User
 
 export const checkAuth = async (req, res, next) => {
   try {
@@ -28,6 +29,14 @@ export const checkAuth = async (req, res, next) => {
 
     const { payload } = decodeToken(token);
     req.headers.role = payload.role;
+
+    // Asigna el usuario a req.user para rutas autenticadas
+    req.user = {
+      id: payload.id,
+      email: payload.email,
+      role: payload.role,
+    };
+
     next();
   } catch (error) {
     console.error("Error al validar las credenciales:", error);

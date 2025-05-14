@@ -81,6 +81,12 @@ router.get("/", async (req, res) => {
   }
 });
 
+// GET authenticated user
+router.get("/me", checkAuth, async (req, res) => {
+  // checkAuth debe poner el usuario en req.user
+  res.json({ success: true, user: req.user });
+});
+
 // GET user by ID
 router.get("/:id", async (req, res) => {
   try {
