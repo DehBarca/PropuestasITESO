@@ -19,7 +19,7 @@
     />
     <link rel="stylesheet" href="../CSS/Styles.css" />
   </head>
-  <body>
+  <body class="d-flex flex-column min-vh-100">
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark navbar-custom px-4">
       <a class="navbar-brand" href="#">
@@ -33,15 +33,14 @@
       <div class="ms-auto d-flex align-items-center gap-4">
         <span class="text-light"><i class="bi bi-shield-check"></i> Admin</span>
         <a href="home.admin.html" class="nav-link"
-          ><i class="bi bi-house-door-fill fs-5"></i
-        ></a>
+          ><i class="bi bi-house-door-fill fs-5"></i></a>
         <a href="#" class="nav-link"><i class="bi bi-gear fs-5"></i></a>
-        <button id="logoutBtn" class="btn btn-outline-light">
-          <a href="Home.html" class="bi bi-box-arrow-right"></a> Cerrar Sesión
-        </button>
-      </div>
+          <!-- Botón de Cerrar Sesión que es completamente clickeable -->
+           <a href="Home.html" id="logoutBtn" class="btn btn-outline-light d-flex align-items-center gap-2">
+              <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+            </a>
+        </div>
     </nav>
-
     <!-- Search Bar -->
     <div
       class="container d-flex align-items-center justify-content-between"
@@ -58,20 +57,18 @@
         </svg>
       </div>
     </div>
-
+<!-- <button id="logoutBtn" class="btn btn-outline-light">
+            <a href="Home.html" class="bi bi-box-arrow-right"></a> Cerrar Sesión
+          </button>-->
     <!-- Admin Controls -->
     <div class="container mt-4">
-      <div class="d-flex justify-content-between align-items-center">
-        <h4>Panel de Administración</h4>
-        <button
-          class="btn btn-primary"
-          data-bs-toggle="modal"
-          data-bs-target="#newPropuestaModal"
-        >
-          <i class="bi bi-plus-circle"></i> Nueva Propuesta
-        </button>
-      </div>
-    </div>
+  <div class="d-flex justify-content-between align-items-center">
+    <h4>Panel de Administración</h4>
+    <a href="nuevapropuesta.html" class="btn btn-primary">
+      <i class="bi bi-plus-circle"></i> Nueva Propuesta
+    </a>
+  </div>
+</div>
 
     <!-- Container de Cards -->
     <div class="container" id="cards-container">
@@ -90,6 +87,11 @@
         </ul>
       </nav>
     </div>
+
+    <!-- Footer que se mantiene abajo -->
+    <footer class="mt-auto text-center py-4 text-muted bg-light">
+      &copy; 2025 Propuestas ITESO App.
+    </footer>
 
     <script type="text/javascript" src="../utils/storage.js"></script>
     <script type="module" src="../utils/utils.js"></script>

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="icon"
+      href="https://images.seeklogo.com/logo-png/45/2/iteso-logo-png_seeklogo-450933.png"
+      type="image/x-icon"
+    />
+    <title>Admin Dashboard - Propuestas ITESO</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    />
+    <link rel="stylesheet" href="../CSS/Styles.css" />
+  </head>
+  <body class="d-flex flex-column min-vh-100">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-custom px-4">
+      <a class="navbar-brand" href="#">
+        <img
+          src="https://images.seeklogo.com/logo-png/45/2/iteso-logo-png_seeklogo-450933.png"
+          alt="ITESO"
+          height="30"
+        />
+        Propuestas ITESO - Admin Dashboard
+      </a>
+      <div class="ms-auto d-flex align-items-center gap-4">
+        <span class="text-light"><i class="bi bi-shield-check"></i> Admin</span>
+        <a href="home.admin.html" class="nav-link"
+          ><i class="bi bi-house-door-fill fs-5"></i
+        ></a>
+        <a href="#" class="nav-link"><i class="bi bi-gear fs-5"></i></a>
+        <button id="logoutBtn" class="btn btn-outline-light">
+          <a href="Home.html" class="bi bi-box-arrow-right"></a> Cerrar Sesión
+        </button>
+      </div>
+    </nav>
+  <!-- Contenido -->
+  <main class="container py-5">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h1 class="mb-4">Añadir Nueva Propuesta</h1>
+        <form id="propuesta-form">
+          <input type="hidden" id="propuesta-id" name="propuesta-id" />
+
+          <div class="mb-3">
+            <label for="propuesta-title" class="form-label">Título de la Propuesta</label>
+            <input type="text" class="form-control" id="propuesta-title" name="title" required />
+          </div>
+
+          <div class="mb-3">
+            <label for="propuesta-description" class="form-label">Descripción</label>
+            <textarea class="form-control" id="propuesta-description" name="description" rows="3" required></textarea>
+          </div>
+
+          <div class="mb-3">
+            <label for="propuesta-image-url" class="form-label">URL de la Imagen</label>
+            <input type="url" class="form-control" id="propuesta-image-url" name="image" placeholder="https://ejemplo.com/imagen.jpg" required />
+          </div>
+
+        
+
+          <div class="row">  
+          <div class="mb-3">
+            <label for="propuesta-instructions" class="form-label">Propuesta</label>
+            <textarea class="form-control" id="propuesta-instructions" name="instructions" rows="5" placeholder="Escribe aqui tu propuesta..." required></textarea>
+          </div>
+
+          <div class="d-flex justify-content-between">
+            <a href="home.admin.html" class="btn btn-outline-secondary">Cancelar</a>
+            <button type="submit" class="btn btn-primary">Guardar Propuesta</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer que se mantiene abajo -->
+  <footer class="text-center py-4 text-muted bg-light mt-5">
+    &copy; 2025 Propuestas ITESO App.
+  </footer>
+
+  <!-- Bootstrap JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

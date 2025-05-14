@@ -19,7 +19,10 @@
       }
     </style>
   </head>
-  <body>
+
+  <!-- ✅ Cambio: añadimos clases para sticky footer -->
+  <body class="d-flex flex-column min-vh-100">
+
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark navbar-custom px-4">
       <a class="navbar-brand" href="HomeLoggedin.html">
@@ -31,90 +34,90 @@
         Propuestas ITESO
       </a>
       <div class="ms-auto d-flex align-items-center gap-4">
-        <a href="HomeLoggedin.html" class="nav-link"
-          ><i class="bi bi-house-door-fill fs-5"></i
-        ></a>
-        <a href="Likes.html" class="nav-link"
-          ><i class="bi bi-bookmark-fill fs-5"></i
-        ></a>
-        <a href="notificaciones.html" class="nav-link"
-          ><i class="bi bi-bell fs-5"></i
-        ></a>
-        <a href="Profile.html" class="nav-link"
-          ><i class="bi bi-person-circle fs-5"></i
-        ></a>
+        <a href="HomeLoggedin.html" class="nav-link"><i class="bi bi-house-door-fill fs-5"></i></a>
+        <a href="Likes.html" class="nav-link"><i class="bi bi-bookmark-fill fs-5"></i></a>
+        <a href="notificaciones.html" class="nav-link"><i class="bi bi-bell fs-5"></i></a>
+        <a href="Profile.html" class="nav-link"><i class="bi bi-person-circle fs-5"></i></a>
       </div>
     </nav>
 
-    <!-- Título -->
-    <div class="container mt-4">
-      <h3 class="text-primary fw-bold">Guardados</h3>
-      <ul class="nav nav-tabs mt-3">
-        <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="#">Historial</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#">Favoritos</a>
-        </li>
-      </ul>
+    <!-- ✅ Cambio: envolvemos el contenido en un <main> con clase flex-grow-1 -->
+    <main class="flex-grow-1">
+      <!-- Título -->
+      <div class="container mt-4">
+        <h3 class="text-primary fw-bold">Guardados</h3>
+        <ul class="nav nav-tabs mt-3">
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="#">Historial</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Favoritos</a>
+          </li>
+        </ul>
 
-      <!-- Tarjetas -->
-      <div class="row mt-4">
-        <!-- Tarjeta 1 -->
-        <div class="col-md-6 mb-4">
-          <div class="card card-light shadow-sm">
-            <div class="card-body">
-              <h5 class="card-title d-flex justify-content-between">
-                Nueva área verde en biblioteca
-                <span class="badge bg-success">Proyecto</span>
-              </h5>
-              <p class="card-text">
-                Propuesta para crear una zona ecológica frente a biblioteca
-                ITESO con áreas para descanso y estudio al aire libre.
-              </p>
-              <div class="d-flex justify-content-between">
-                <button class="btn btn-outline-success btn-sm">
-                  <i class="bi bi-hand-thumbs-up"></i> 234
-                </button>
-                <button class="btn btn-outline-danger btn-sm">
-                  <i class="bi bi-hand-thumbs-down"></i> 8
-                </button>
-                <button class="btn btn-outline-primary btn-sm">
-                  <i class="bi bi-chat"></i> 13
-                </button>
+        <!-- Tarjetas -->
+        <div class="row mt-4">
+          <!-- Tarjeta 1 -->
+          <div class="col-md-6 mb-4">
+            <div class="card card-light shadow-sm">
+              <div class="card-body">
+                <h5 class="card-title d-flex justify-content-between">
+                  Nueva área verde en biblioteca
+                  <span class="badge bg-success">Proyecto</span>
+                </h5>
+                <p class="card-text">
+                  Propuesta para crear una zona ecológica frente a biblioteca
+                  ITESO con áreas para descanso y estudio al aire libre.
+                </p>
+                <div class="d-flex justify-content-between">
+                  <button class="btn btn-outline-success btn-sm">
+                    <i class="bi bi-hand-thumbs-up"></i> 234
+                  </button>
+                  <button class="btn btn-outline-danger btn-sm">
+                    <i class="bi bi-hand-thumbs-down"></i> 8
+                  </button>
+                  <button class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-chat"></i> 13
+                  </button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <!-- Tarjeta 2 -->
-        <div class="col-md-6 mb-4">
-          <div class="card card-light shadow-sm">
-            <div class="card-body">
-              <h5 class="card-title d-flex justify-content-between">
-                Mejoras al portal estudiantil
-                <span class="badge bg-warning text-dark">Idea</span>
-              </h5>
-              <p class="card-text">
-                Rediseñar la interfaz del portal de alumnos para hacerlo más
-                intuitivo y fácil de navegar desde móviles.
-              </p>
-              <div class="d-flex justify-content-between">
-                <button class="btn btn-outline-success btn-sm">
-                  <i class="bi bi-hand-thumbs-up"></i> 121
-                </button>
-                <button class="btn btn-outline-danger btn-sm">
-                  <i class="bi bi-hand-thumbs-down"></i> 4
-                </button>
-                <button class="btn btn-outline-primary btn-sm">
-                  <i class="bi bi-chat"></i> 5
-                </button>
+          <!-- Tarjeta 2 -->
+          <div class="col-md-6 mb-4">
+            <div class="card card-light shadow-sm">
+              <div class="card-body">
+                <h5 class="card-title d-flex justify-content-between">
+                  Mejoras al portal estudiantil
+                  <span class="badge bg-warning text-dark">Idea</span>
+                </h5>
+                <p class="card-text">
+                  Rediseñar la interfaz del portal de alumnos para hacerlo más
+                  intuitivo y fácil de navegar desde móviles.
+                </p>
+                <div class="d-flex justify-content-between">
+                  <button class="btn btn-outline-success btn-sm">
+                    <i class="bi bi-hand-thumbs-up"></i> 121
+                  </button>
+                  <button class="btn btn-outline-danger btn-sm">
+                    <i class="bi bi-hand-thumbs-down"></i> 4
+                  </button>
+                  <button class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-chat"></i> 5
+                  </button>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </main>
+
+    <!-- Footer que se mantiene abajo -->
+    <footer class="mt-auto text-center py-4 text-muted bg-light">
+      &copy; 2025 Propuestas ITESO App.
+    </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module" src="../scripts/likes.js"></script>
