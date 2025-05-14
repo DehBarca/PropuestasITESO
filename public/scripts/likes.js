@@ -47,16 +47,18 @@ async function cargarLikes() {
   }
 }
 
-function crearCard(propuesta) {
+function crearCard(propuesta, onRemove) {
   const cardDiv = document.createElement("div");
   cardDiv.className = "col-md-4 mb-4";
   cardDiv.innerHTML = `
-    <div class="card h-100">
+    <div class="card card-light h-100">
       <img src="${
         propuesta.img || "https://via.placeholder.com/150"
-      }" class="card-img-top" alt="${propuesta.title}">
+      }" class="card-img-top" alt="${propuesta.title || propuesta.titulo}">
       <div class="card-body d-flex flex-column">
-        <h5 class="card-title">${propuesta.title}</h5>
+        <h5 class="card-title">${
+          propuesta.titulo || propuesta.title || "Sin título"
+        }</h5>
         <div class="mb-2">
           ${(propuesta.category || [])
             .map(
@@ -65,17 +67,38 @@ function crearCard(propuesta) {
             )
             .join("")}
         </div>
-        <p class="card-text">${propuesta.descripcion}</p>
+        <p class="card-text">${
+          propuesta.descripcion || propuesta.description || "Sin descripción"
+        }</p>
         <div class="mt-auto">
-          <button class="btn btn-outline-warning save-btn" data-id="${
+          <button class="btn btn-warning save-btn" data-id="${
             propuesta._id
-          }" title="Guardado" disabled>
-            <i class="bi bi-bookmark-fill"></i> Guardado
+          }" title="Quitar de guardados">
+            <i class="bi bi-bookmark-fill"></i> Quitar de guardados
           </button>
         </div>
       </div>
     </div>
   `;
+
+  // Evento para quitar de guardados
+  cardDiv.querySelector(".save-btn").addEventListener("click", async (e) => {
+    const propuestaId = propuesta._id;
+    try {
+      const response = await fetch(`/api/user/save/${propuestaId}`, {
+        method: "POST",
+        credentials: "include",
+      });
+      const result = await response.json();
+      if (result.success && result.action === "removed") {
+        cardDiv.remove();
+        if (onRemove) onRemove();
+      }
+    } catch (error) {
+      console.error("Error al quitar de guardados:", error);
+    }
+  });
+
   return cardDiv;
 }
 
@@ -126,24 +149,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     container.innerHTML = ""; // Limpiar el contenedor
 
     data.saved.forEach((propuesta) => {
-      // Ajusta los campos según tu modelo de propuesta
-      const card = document.createElement("div");
-      card.className = "col-md-4 mb-4";
-      card.innerHTML = `
-        <div class="card card-light h-100">
-          <div class="card-body">
-            <h5 class="card-title">${
-              propuesta.titulo || propuesta.title || "Sin título"
-            }</h5>
-            <p class="card-text">${
-              propuesta.descripcion ||
-              propuesta.description ||
-              "Sin descripción"
-            }</p>
-            <!-- Puedes agregar más campos aquí -->
-          </div>
-        </div>
-      `;
+      const card = crearCard(propuesta, () => {
+        // Si ya no quedan cards, muestra mensaje
+        if (container.children.length === 0) {
+          container.innerHTML = `<p class="text-center text-muted">No tienes propuestas guardadas.</p>`;
+        }
+      });
       container.appendChild(card);
     });
   } catch (error) {
