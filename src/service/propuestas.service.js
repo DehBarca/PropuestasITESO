@@ -5,7 +5,13 @@ import { decodeToken } from "../utils/jwt.js";
 class PropuestaService {
   constructor() {}
 
-  getPropuestas = async (page = 1, limit = 6, search = "", userId = null) => {
+  getPropuestas = async (
+    page = 1,
+    limit = 6,
+    search = "",
+    userId = null,
+    autor = null
+  ) => {
     try {
       const skip = (page - 1) * limit;
       let query = {};
@@ -17,6 +23,10 @@ class PropuestaService {
             { category: { $regex: search, $options: "i" } },
           ],
         };
+      }
+
+      if (autor) {
+        query.autor = autor;
       }
 
       const [propuestas, total] = await Promise.all([

@@ -7,16 +7,16 @@ const router = express.Router();
 const service = new PropuestaService();
 
 router.get("/", async (req, res) => {
-  try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 6;
-    const search = req.query.search || "";
-
-    const propuestas = await service.getPropuestas(page, limit, search);
-    res.status(200).json(propuestas);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
+  const { page, limit, search, userId, autor } = req.query;
+  // pásalo al servicio
+  const result = await service.getPropuestas(
+    page,
+    limit,
+    search,
+    userId,
+    autor
+  );
+  res.json(result);
 });
 
 router.get("/:id", async (req, res) => {
