@@ -29,7 +29,10 @@ const UserSchema = new Schema({
 UserSchema.pre("save", async function (next) {
   try {
     this.email = String(this.email).toLowerCase();
-    this.password = await encriptar(this.password);
+    // Solo encripta si la contraseña fue modificada y no parece un hash
+    if (this.isModified("password") && !this.password.startsWith("$2b$")) {
+      this.password = await encriptar(this.password);
+    }
     next();
   } catch (error) {
     console.error(error);

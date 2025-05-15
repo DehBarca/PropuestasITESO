@@ -31,7 +31,6 @@ const login = async (email, password) => {
     if (response.ok && data.success) {
       showMessage("Inicio de sesión exitoso", false);
       setTimeout(() => {
-        // Redirigir a HomeLoggedin.html
         window.location.href = "/HomeLoggedin.html";
       }, 1500);
     } else {

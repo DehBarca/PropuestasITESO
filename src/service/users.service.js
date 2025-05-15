@@ -66,8 +66,8 @@ export class UserService {
         return [false, "No se encontró el email"];
       }
 
-      const iguales = await comparar(user.password, password);
-      if (!iguales) {
+      const validPassword = await comparar(password, user.password);
+      if (!validPassword) {
         return [false, "la contraseña no es válida"];
       }
 
@@ -122,7 +122,7 @@ export class UserService {
         return { success: false, message: "Email no encontrado" };
       }
 
-      const validPassword = await comparar(user.password, password);
+      const validPassword = await comparar(password, user.password);
       if (!validPassword) {
         return { success: false, message: "Contraseña incorrecta" };
       }
