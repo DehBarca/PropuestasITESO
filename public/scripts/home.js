@@ -134,6 +134,7 @@ function addCardEventListeners(cardDiv, canEdit) {
   const likeBtn = cardDiv.querySelector(".like-btn");
   const dislikeBtn = cardDiv.querySelector(".dislike-btn");
   const saveBtn = cardDiv.querySelector(".save-btn");
+  const commentBtn = cardDiv.querySelector(".comment-btn");
 
   // LIKE
   likeBtn.addEventListener("click", async (e) => {
@@ -256,6 +257,14 @@ function addCardEventListeners(cardDiv, canEdit) {
       } catch (error) {
         showMessage("Error al guardar propuesta", true);
       }
+    });
+  }
+
+  // COMENTARIOS
+  if (commentBtn) {
+    commentBtn.addEventListener("click", (e) => {
+      const propuestaId = commentBtn.dataset.id;
+      window.location.href = `comentarios.html?id=${propuestaId}`;
     });
   }
 
