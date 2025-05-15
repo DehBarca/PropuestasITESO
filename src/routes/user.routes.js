@@ -79,8 +79,22 @@ router.get("/", async (req, res) => {
 
 // GET authenticated user
 router.get("/me", checkAuth, async (req, res) => {
-  // checkAuth debe poner el usuario en req.user
-  res.json({ success: true, user: req.user });
+  try {
+    const user = await User.findById(req.user.id).lean();
+    if (!user)
+      return res.status(404).json({ success: false, message: "No encontrado" });
+    res.json({
+      success: true,
+      user: {
+        id: user._id,
+        email: user.email,
+        role: user.role,
+        user: user.user,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Error interno" });
+  }
 });
 
 // GET user by ID
