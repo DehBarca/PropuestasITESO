@@ -125,12 +125,12 @@ function crearCard(propuesta) {
   cardDiv.innerHTML = card;
 
   // Add event listeners
-  addCardEventListeners(cardDiv, isAdmin);
+  addCardEventListeners(cardDiv, isAdmin || isOwner);
 
   return cardDiv;
 }
 
-function addCardEventListeners(cardDiv, isAdmin) {
+function addCardEventListeners(cardDiv, canEdit) {
   const likeBtn = cardDiv.querySelector(".like-btn");
   const dislikeBtn = cardDiv.querySelector(".dislike-btn");
   const saveBtn = cardDiv.querySelector(".save-btn");
@@ -260,7 +260,7 @@ function addCardEventListeners(cardDiv, isAdmin) {
   }
 
   // Admin controls
-  if (isAdmin) {
+  if (canEdit) {
     cardDiv.querySelector(".edit-btn")?.addEventListener("click", handleEdit);
     cardDiv
       .querySelector(".delete-btn")
@@ -270,11 +270,67 @@ function addCardEventListeners(cardDiv, isAdmin) {
 
 async function handleEdit(e) {
   const id = e.currentTarget.dataset.id;
-  // Implement edit functionality
+  const card = e.currentTarget.closest(".col-md-4");
+  const title = card.querySelector(".card-title").textContent;
+  const descripcion = card.querySelector(".card-text").textContent;
+  const img = card.querySelector(".card-img-top").src;
+  const category = Array.from(card.querySelectorAll(".card-category")).map(
+    (btn) => btn.textContent
+  );
+
+  // Modal simple usando prompt (puedes reemplazar por un modal de Bootstrap)
+  const newTitle = prompt("Editar título:", title);
+  if (newTitle === null) return;
+  const newDescripcion = prompt("Editar descripción:", descripcion);
+  if (newDescripcion === null) return;
+  const newCategory = prompt(
+    "Editar categorías (separadas por coma):",
+    category.join(", ")
+  );
+  if (newCategory === null) return;
+  const newImg = prompt("Editar URL de imagen:", img);
+  if (newImg === null) return;
+
+  const updated = {
+    title: newTitle,
+    descripcion: newDescripcion,
+    category: newCategory.split(",").map((s) => s.trim()),
+    img: newImg,
+  };
+
+  try {
+    const response = await fetch(`${API_URL}/api/propuesta/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify(updated),
+    });
+    if (response.ok) {
+      // Actualiza la card en el DOM
+      card.querySelector(".card-title").textContent = updated.title;
+      card.querySelector(".card-text").textContent = updated.descripcion;
+      card.querySelector(".card-img-top").src = updated.img;
+      const catDiv = card.querySelector(".mb-2");
+      catDiv.innerHTML = updated.category
+        .map(
+          (cat) =>
+            `<button class="btn btn-primary btn-sm card-category me-1 mb-1" disabled>${cat}</button>`
+        )
+        .join("");
+      showMessage("Propuesta actualizada exitosamente");
+    } else {
+      showMessage("Error al actualizar la propuesta", true);
+    }
+  } catch (error) {
+    showMessage("Error al actualizar la propuesta", true);
+  }
 }
 
 async function handleDelete(e) {
-  const id = e.currentTarget.dataset.id;
+  const btn = e.currentTarget;
+  const id = btn?.dataset.id;
+  if (!id) return;
+
   if (confirm("¿Estás seguro de que quieres eliminar esta propuesta?")) {
     try {
       const response = await fetch(`${API_URL}/api/propuesta/${id}`, {
@@ -283,7 +339,9 @@ async function handleDelete(e) {
       });
 
       if (response.ok) {
-        e.currentTarget.closest(".col-md-4").remove();
+        // Solo elimina si btn y su card existen
+        const card = btn.closest(".col-md-4");
+        if (card) card.remove();
         showMessage("Propuesta eliminada exitosamente");
       }
     } catch (error) {
