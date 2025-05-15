@@ -21,7 +21,15 @@ async function cargarPerfil() {
       );
       const propuestasData = await propuestasRes.json();
 
-      // 3. Obtener propuestas guardadas
+      // 3. Obtener número de comentarios en las propuestas del usuario
+      const comentariosRes = await fetch(
+        `${API_URL}/api/propuesta/estadisticas/${data.user.id}/comentarios`,
+        { credentials: "include" }
+      );
+      const comentariosData = await comentariosRes.json();
+      const comentariosEnPropuestas = comentariosData.totalComentarios || 0;
+
+      // 4. Obtener propuestas guardadas
       const savedRes = await fetch("/api/user/saved", {
         credentials: "include",
       });
@@ -40,6 +48,7 @@ async function cargarPerfil() {
           (acc, p) => acc + (p.likes || 0),
           0
         )}</b></li>`,
+        `<li class="list-group-item">Comentarios en tus propuestas: <b>${comentariosEnPropuestas}</b></li>`,
         `<li class="list-group-item">Proyectos seguidos: <b>${proyectosSeguidos}</b></li>`,
       ];
       document.getElementById("userStats").innerHTML = stats.join("");

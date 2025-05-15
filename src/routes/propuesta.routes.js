@@ -219,4 +219,19 @@ router.post("/:id/comentarios", checkAuth, async (req, res) => {
   }
 });
 
+// Obtener número de comentarios en las propuestas de un usuario
+router.get("/estadisticas/:userId/comentarios", async (req, res) => {
+  try {
+    // Busca todas las propuestas del usuario
+    const propuestas = await service.getPropuestas(null, null, null, null, req.params.userId);
+    const propuestasIds = propuestas.items.map(p => p._id);
+
+    // Cuenta los comentarios en esas propuestas
+    const totalComentarios = await Comentario.countDocuments({ propuesta: { $in: propuestasIds } });
+    res.json({ success: true, totalComentarios });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
 export default router;
