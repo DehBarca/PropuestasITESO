@@ -270,7 +270,10 @@ function addCardEventListeners(cardDiv, canEdit) {
 
   // Admin controls
   if (canEdit) {
-    cardDiv.querySelector(".edit-btn")?.addEventListener("click", handleEdit);
+    cardDiv.querySelector(".edit-btn")?.addEventListener("click", (e) => {
+      const id = e.currentTarget.dataset.id;
+      window.location.href = `editarpropuesta.html?id=${id}`;
+    });
     cardDiv
       .querySelector(".delete-btn")
       ?.addEventListener("click", handleDelete);
