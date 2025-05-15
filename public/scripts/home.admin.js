@@ -1,6 +1,9 @@
 const API_URL = "http://localhost:8080";
 
 let currentUser = null;
+let paginaActual = 1;
+let totalPaginas = 1;
+let searchTimeout = null;
 
 async function getCurrentUser() {
   try {
@@ -332,9 +335,11 @@ async function handleDelete(e) {
   }
 }
 
-async function cargarPropuestas() {
+async function cargarPropuestas(pagina = 1, searchTerm = "") {
   try {
-    let url = `${API_URL}/api/propuesta?page=1&limit=1000`;
+    let url = `${API_URL}/api/propuesta?page=${pagina}&limit=6&search=${encodeURIComponent(
+      searchTerm
+    )}`;
     if (currentUser && currentUser.id) {
       url += `&userId=${currentUser.id}`;
     }
@@ -342,24 +347,20 @@ async function cargarPropuestas() {
       credentials: "include",
     });
     const data = await response.json();
-    console.log("Propuestas recibidas:", data); // <-- Para depuración
-
     const container = document.querySelector("#cards-container .row");
-    if (!container) {
-      console.error("No se encontró el contenedor de cards");
-      return;
-    }
     container.innerHTML = "";
 
     if (!data.items || data.items.length === 0) {
       container.innerHTML =
         '<div class="col-12 text-center">No se encontraron propuestas</div>';
-      return;
+      return 0;
     }
 
     data.items.forEach((propuesta) => {
       container.appendChild(crearCard(propuesta));
     });
+
+    return data.totalPages;
   } catch (error) {
     const container = document.querySelector("#cards-container .row");
     if (container) {
@@ -367,12 +368,65 @@ async function cargarPropuestas() {
         '<div class="col-12 text-center text-danger">Error al cargar las propuestas</div>';
     }
     console.error("Error al cargar propuestas:", error);
+    return 0;
+  }
+}
+
+function actualizarBotones(
+  btnAnterior,
+  btnSiguiente,
+  paginaActual,
+  totalPaginas
+) {
+  if (paginaActual <= 1) {
+    btnAnterior.parentElement.classList.add("disabled");
+  } else {
+    btnAnterior.parentElement.classList.remove("disabled");
+  }
+  if (paginaActual >= totalPaginas) {
+    btnSiguiente.parentElement.classList.add("disabled");
+  } else {
+    btnSiguiente.parentElement.classList.remove("disabled");
   }
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
   await getCurrentUser();
-  await cargarPropuestas();
+
+  const btnSiguiente = document.getElementById("btnSiguiente");
+  const btnAnterior = document.getElementById("btnAnterior");
+  const searchInput = document.querySelector(".input");
+
+  paginaActual = 1;
+  totalPaginas = await cargarPropuestas(paginaActual);
+
+  actualizarBotones(btnAnterior, btnSiguiente, paginaActual, totalPaginas);
+
+  // Search handler con debounce
+  searchInput.addEventListener("input", (e) => {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(async () => {
+      paginaActual = 1;
+      totalPaginas = await cargarPropuestas(1, e.target.value);
+      actualizarBotones(btnAnterior, btnSiguiente, paginaActual, totalPaginas);
+    }, 300);
+  });
+
+  btnSiguiente?.addEventListener("click", async () => {
+    if (paginaActual < totalPaginas) {
+      paginaActual++;
+      await cargarPropuestas(paginaActual, searchInput.value);
+      actualizarBotones(btnAnterior, btnSiguiente, paginaActual, totalPaginas);
+    }
+  });
+
+  btnAnterior?.addEventListener("click", async () => {
+    if (paginaActual > 1) {
+      paginaActual--;
+      await cargarPropuestas(paginaActual, searchInput.value);
+      actualizarBotones(btnAnterior, btnSiguiente, paginaActual, totalPaginas);
+    }
+  });
 });
 
 const updateLikes = async (id, token, isLike = true) => {

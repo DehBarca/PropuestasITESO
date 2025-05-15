@@ -21,6 +21,16 @@ async function cargarPerfil() {
       );
       const propuestasData = await propuestasRes.json();
 
+      // 3. Obtener propuestas guardadas
+      const savedRes = await fetch("/api/user/saved", {
+        credentials: "include",
+      });
+      const savedData = await savedRes.json();
+      const proyectosSeguidos =
+        savedData.success && Array.isArray(savedData.saved)
+          ? savedData.saved.length
+          : 0;
+
       // Estadísticas
       const stats = [
         `<li class="list-group-item">Publicaciones: <b>${
@@ -30,7 +40,7 @@ async function cargarPerfil() {
           (acc, p) => acc + (p.likes || 0),
           0
         )}</b></li>`,
-        `<li class="list-group-item">Proyectos seguidos: <b>-</b></li>`, // Puedes personalizar esto
+        `<li class="list-group-item">Proyectos seguidos: <b>${proyectosSeguidos}</b></li>`,
       ];
       document.getElementById("userStats").innerHTML = stats.join("");
 
@@ -57,7 +67,7 @@ async function cargarPerfil() {
           '<li class="list-group-item">No tienes publicaciones</li>';
       }
 
-      // (Opcional) Lista de contribuciones (comentarios/interacciones)
+      // (Opcional) Lista de contribuciones
       document.getElementById("userContribuciones").innerHTML =
         '<li class="list-group-item">Próximamente...</li>';
     }

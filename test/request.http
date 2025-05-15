@@ -62,7 +62,7 @@ Content-Type: application/json
 {
     "user": "Admin",
     "role": "admin",
-    "email": "admin@test.com",
+    "email": "admin1@test.com",
     "password": "admin"
 }
 
