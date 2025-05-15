@@ -131,10 +131,14 @@ function crearCard(propuesta) {
 }
 
 function addCardEventListeners(cardDiv, isAdmin) {
-  cardDiv.querySelector(".like-btn").addEventListener("click", async (e) => {
+  const likeBtn = cardDiv.querySelector(".like-btn");
+  const dislikeBtn = cardDiv.querySelector(".dislike-btn");
+  const saveBtn = cardDiv.querySelector(".save-btn");
+
+  // LIKE
+  likeBtn.addEventListener("click", async (e) => {
     const button = e.currentTarget;
     button.disabled = true;
-
     try {
       const response = await fetch(
         `${API_URL}/api/propuesta/${button.dataset.id}/like`,
@@ -144,94 +148,118 @@ function addCardEventListeners(cardDiv, isAdmin) {
           credentials: "include",
         }
       );
-
       const result = await response.json();
 
-      if (response.ok && result.success) {
+      if (response.ok && result.success && result.data) {
         const likesCount = button.querySelector(".likes-count");
-        likesCount.textContent = parseInt(likesCount.textContent) + 1;
+        const dislikesCount = dislikeBtn.querySelector(".dislikes-count");
+        likesCount.textContent = result.data.likes;
+        dislikesCount.textContent = result.data.dislikes;
 
-        button.classList.remove("btn-outline-success");
-        button.classList.add("btn-success");
-        setTimeout(() => {
-          button.classList.remove("btn-success");
+        // Estado visual
+        if (result.data.userLike) {
+          button.classList.add("active", "btn-success");
+          button.classList.remove("btn-outline-success");
+        } else {
+          button.classList.remove("active", "btn-success");
           button.classList.add("btn-outline-success");
-        }, 500);
+        }
+
+        if (result.data.userDislike) {
+          dislikeBtn.classList.add("active", "btn-danger");
+          dislikeBtn.classList.remove("btn-outline-danger");
+        } else {
+          dislikeBtn.classList.remove("active", "btn-danger");
+          dislikeBtn.classList.add("btn-outline-danger");
+        }
       } else {
         showMessage(result.message || "Error al procesar la acción", true);
       }
     } catch (error) {
-      console.error("Error:", error);
       showMessage("Error al procesar la acción", true);
     } finally {
       button.disabled = false;
     }
   });
 
-  cardDiv.querySelector(".dislike-btn").addEventListener("click", async (e) => {
+  // DISLIKE
+  dislikeBtn.addEventListener("click", async (e) => {
     const button = e.currentTarget;
-    const id = button.dataset.id;
-
-    // Disable button temporarily to prevent multiple clicks
     button.disabled = true;
-
     try {
-      const response = await fetch(`${API_URL}/api/propuesta/${id}/dislike`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        mode: "cors",
-        credentials: "include",
-      });
+      const response = await fetch(
+        `${API_URL}/api/propuesta/${button.dataset.id}/dislike`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+        }
+      );
+      const result = await response.json();
 
-      if (response.ok) {
+      if (response.ok && result.success && result.data) {
+        const likesCount = likeBtn.querySelector(".likes-count");
         const dislikesCount = button.querySelector(".dislikes-count");
-        const currentDislikes = parseInt(dislikesCount.textContent);
-        dislikesCount.textContent = currentDislikes + 1;
+        likesCount.textContent = result.data.likes;
+        dislikesCount.textContent = result.data.dislikes;
 
-        // Visual feedback
-        button.classList.remove("btn-outline-danger");
-        button.classList.add("btn-danger");
-        setTimeout(() => {
-          button.classList.remove("btn-danger");
+        // Estado visual
+        if (result.data.userDislike) {
+          button.classList.add("active", "btn-danger");
+          button.classList.remove("btn-outline-danger");
+        } else {
+          button.classList.remove("active", "btn-danger");
           button.classList.add("btn-outline-danger");
-        }, 500);
+        }
+
+        if (result.data.userLike) {
+          likeBtn.classList.add("active", "btn-success");
+          likeBtn.classList.remove("btn-outline-success");
+        } else {
+          likeBtn.classList.remove("active", "btn-success");
+          likeBtn.classList.add("btn-outline-success");
+        }
+      } else {
+        showMessage(result.message || "Error al procesar la acción", true);
       }
     } catch (error) {
-      console.error("Error:", error);
+      showMessage("Error al procesar la acción", true);
     } finally {
       button.disabled = false;
     }
   });
 
-  cardDiv.querySelector(".save-btn").addEventListener("click", async (e) => {
-    const button = e.currentTarget;
-    const propuestaId = button.dataset.id;
-    try {
-      const response = await fetch(`/api/user/save/${propuestaId}`, {
-        method: "POST",
-        credentials: "include",
-      });
-      const result = await response.json();
-      if (result.success) {
-        if (result.action === "added") {
-          button.classList.remove("btn-outline-warning");
-          button.classList.add("btn-warning");
-          button.querySelector("i").classList.remove("bi-bookmark");
-          button.querySelector("i").classList.add("bi-bookmark-fill");
-        } else {
-          button.classList.remove("btn-warning");
-          button.classList.add("btn-outline-warning");
-          button.querySelector("i").classList.remove("bi-bookmark-fill");
-          button.querySelector("i").classList.add("bi-bookmark");
+  // GUARDADO
+  if (saveBtn) {
+    saveBtn.addEventListener("click", async (e) => {
+      const button = e.currentTarget;
+      const propuestaId = button.dataset.id;
+      try {
+        const response = await fetch(`/api/user/save/${propuestaId}`, {
+          method: "POST",
+          credentials: "include",
+        });
+        const result = await response.json();
+        if (result.success) {
+          if (result.action === "added") {
+            button.classList.remove("btn-outline-warning");
+            button.classList.add("btn-warning");
+            button.querySelector("i").classList.remove("bi-bookmark");
+            button.querySelector("i").classList.add("bi-bookmark-fill");
+          } else {
+            button.classList.remove("btn-warning");
+            button.classList.add("btn-outline-warning");
+            button.querySelector("i").classList.remove("bi-bookmark-fill");
+            button.querySelector("i").classList.add("bi-bookmark");
+          }
         }
+      } catch (error) {
+        showMessage("Error al guardar propuesta", true);
       }
-    } catch (error) {
-      console.error("Error al guardar propuesta:", error);
-    }
-  });
+    });
+  }
 
+  // Admin controls
   if (isAdmin) {
     cardDiv.querySelector(".edit-btn")?.addEventListener("click", handleEdit);
     cardDiv

@@ -5,7 +5,7 @@ import { decodeToken } from "../utils/jwt.js";
 class PropuestaService {
   constructor() {}
 
-  getPropuestas = async (page = 1, limit = 6, search = "") => {
+  getPropuestas = async (page = 1, limit = 6, search = "", userId = null) => {
     try {
       const skip = (page - 1) * limit;
       let query = {};
@@ -27,6 +27,22 @@ class PropuestaService {
           .lean(),
         Propuesta.countDocuments(query),
       ]);
+
+      // Si hay userId, agrega userLike/userDislike a cada propuesta
+      if (userId) {
+        const interactions = await Interaction.find({
+          userId,
+          propuestaId: { $in: propuestas.map((p) => p._id) },
+        }).lean();
+
+        propuestas.forEach((p) => {
+          const inter = interactions.find(
+            (i) => i.propuestaId.toString() === p._id.toString()
+          );
+          p.userLike = inter?.type === "like";
+          p.userDislike = inter?.type === "dislike";
+        });
+      }
 
       return {
         items: propuestas,
@@ -85,7 +101,6 @@ class PropuestaService {
 
   updateLikes = async (id, token, isLike = true) => {
     try {
-      // Decodificar el token para obtener el ID del usuario
       const decoded = decodeToken(token);
       if (!decoded || !decoded.payload.id) {
         throw new Error("Usuario no autorizado");
@@ -93,6 +108,7 @@ class PropuestaService {
 
       const userId = decoded.payload.id;
       const updateField = isLike ? "likes" : "dislikes";
+      const oppositeField = isLike ? "dislikes" : "likes";
 
       // Buscar interacción existente
       const existingInteraction = await Interaction.findOne({
@@ -100,38 +116,60 @@ class PropuestaService {
         propuestaId: id,
       });
 
-      if (existingInteraction) {
-        if (existingInteraction.type === (isLike ? "like" : "dislike")) {
-          return {
-            success: false,
-            message: "Ya has interactuado con esta propuesta",
-          };
-        }
+      let userLike = false;
+      let userDislike = false;
 
-        // Revertir la interacción anterior
-        await Propuesta.findByIdAndUpdate(id, {
-          $inc: {
-            [existingInteraction.type === "like" ? "likes" : "dislikes"]: -1,
-          },
+      if (existingInteraction) {
+        if (
+          (isLike && existingInteraction.type === "like") ||
+          (!isLike && existingInteraction.type === "dislike")
+        ) {
+          // Si ya existe la misma interacción, quitarla (toggle)
+          await Propuesta.findByIdAndUpdate(id, {
+            $inc: { [updateField]: -1 },
+          });
+          await existingInteraction.deleteOne();
+        } else {
+          // Cambiar de like a dislike o viceversa
+          await Propuesta.findByIdAndUpdate(id, {
+            $inc: { [updateField]: 1, [oppositeField]: -1 },
+          });
+          existingInteraction.type = isLike ? "like" : "dislike";
+          await existingInteraction.save();
+        }
+      } else {
+        // Crear nueva interacción
+        await Interaction.create({
+          userId,
+          propuestaId: id,
+          type: isLike ? "like" : "dislike",
         });
-        await existingInteraction.deleteOne();
+        await Propuesta.findByIdAndUpdate(id, {
+          $inc: { [updateField]: 1 },
+        });
       }
 
-      // Crear nueva interacción
-      await Interaction.create({
+      // Obtener el estado actualizado
+      const propuesta = await Propuesta.findById(id).lean();
+      const userInteraction = await Interaction.findOne({
         userId,
         propuestaId: id,
-        type: isLike ? "like" : "dislike",
       });
 
-      // Actualizar contador
-      const result = await Propuesta.findByIdAndUpdate(
-        id,
-        { $inc: { [updateField]: 1 } },
-        { new: true }
-      );
+      if (userInteraction) {
+        userLike = userInteraction.type === "like";
+        userDislike = userInteraction.type === "dislike";
+      }
 
-      return { success: true, data: result };
+      return {
+        success: true,
+        data: {
+          likes: propuesta.likes,
+          dislikes: propuesta.dislikes,
+          userLike,
+          userDislike,
+        },
+      };
     } catch (error) {
       console.error(
         `Error al actualizar ${isLike ? "likes" : "dislikes"}: `,

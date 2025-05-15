@@ -63,21 +63,21 @@ Content-Type: application/json
     "user": "Admin",
     "role": "admin",
     "email": "admin@test.com",
-    "password": "Password123234!"
+    "password": "admin"
 }
 
 ###
 // Actualizar usuario por ID
-PUT http://127.0.0.1:8080/api/user/YOUR_USER_ID HTTP/1.1
+PUT http://127.0.0.1:8080/api/user/681c3c4e1152f6ad34137473 HTTP/1.1
 Content-Type: application/json
 
 {
     "user": "UpdatedUser",
     "role": "admin",
-    "email": "updated@test.com",
-    "password": "NewPassword123!"
+    "email": "admin@test.com",
+    "password": "admin"
 }
 
 ###
 // Eliminar usuario por ID
-DELETE http://127.0.0.1:8080/api/user/681c3bb2bfbf6c18470603cc HTTP/1.1
+DELETE http://127.0.0.1:8080/api/user/682531d1c7f1b6e0a3f4653f HTTP/1.1

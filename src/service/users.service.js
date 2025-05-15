@@ -94,10 +94,10 @@ export class UserService {
       }
 
       const user = new User({
-        user: userData.user, // Changed from userData.nombre to userData.user
+        user: userData.user,
         email: userData.email,
         password: userData.password,
-        role: "user",
+        role: userData.role || "user",
       });
 
       await user.save();

@@ -130,4 +130,59 @@ router.delete("/:id", checkAuth, async (req, res) => {
   }
 });
 
+// Guardar/Quitar propuesta de favoritos
+router.post("/save/:propuestaId", checkAuth, async (req, res) => {
+  try {
+    const token = req.cookies.jwt;
+    const { payload } = decodeToken(token);
+    const userId = payload.id;
+    const propuestaId = req.params.propuestaId;
+
+    if (!mongoose.Types.ObjectId.isValid(propuestaId)) {
+      return res.status(400).json({ message: "ID de propuesta inválido" });
+    }
+
+    const user = await User.findById(userId);
+    if (!user)
+      return res.status(404).json({ message: "Usuario no encontrado" });
+
+    if (!Array.isArray(user.saved)) {
+      user.saved = [];
+    }
+
+    const index = user.saved.findIndex((id) => id.toString() === propuestaId);
+    let action;
+    if (index >= 0) {
+      user.saved.splice(index, 1);
+      action = "removed";
+    } else {
+      user.saved.push(propuestaId);
+      action = "added";
+    }
+    await user.save();
+    res.json({ success: true, action, saved: user.saved });
+  } catch (error) {
+    console.error("Error en /save/:propuestaId:", error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// Obtener propuestas guardadas del usuario autenticado
+router.get("/saved", checkAuth, async (req, res) => {
+  try {
+    const token = req.cookies.jwt;
+    const { payload } = decodeToken(token);
+    const userId = payload.id;
+
+    const user = await User.findById(userId).populate("saved");
+    if (!user)
+      return res.status(404).json({ message: "Usuario no encontrado" });
+
+    res.json({ success: true, saved: user.saved });
+  } catch (error) {
+    console.error("Error en /saved:", error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
 export default router;

@@ -45,8 +45,6 @@ router.post("/save/:propuestaId", checkAuth, async (req, res) => {
   } catch (error) {
     console.error("Error en /save/:propuestaId:", error);
     res.status(500).json({ success: false, message: error.message });
-  } finally {
-    await dbDisconnect();
   }
 });
 
@@ -66,8 +64,6 @@ router.get("/saved", checkAuth, async (req, res) => {
   } catch (error) {
     console.error("Error en /saved:", error); // <--- Agrega esto
     res.status(500).json({ success: false, message: error.message });
-  } finally {
-    await dbDisconnect();
   }
 });
 

@@ -44,6 +44,13 @@ function crearCard(propuesta) {
     </div>
   `;
 
+  const likeActive = propuesta.userLike
+    ? "active btn-success"
+    : "btn-outline-success";
+  const dislikeActive = propuesta.userDislike
+    ? "active btn-danger"
+    : "btn-outline-danger";
+
   const card = `
     <div class="card h-100">
       <img src="${propuesta.img || "https://via.placeholder.com/150"}" 
@@ -62,6 +69,25 @@ function crearCard(propuesta) {
         <p class="card-text">${propuesta.descripcion}</p>
         <p class="card-text text-muted mb-1"><small>Autor: ${autorNombre}</small></p>
         <div class="mt-auto">
+          <div class="d-flex justify-content-between align-items-center">
+            <button class="btn ${likeActive} like-btn" data-id="${
+    propuesta._id
+  }">
+              <i class="bi bi-hand-thumbs-up"></i> 
+              <span class="likes-count">${propuesta.likes || 0}</span>
+            </button>
+            <button class="btn ${dislikeActive} dislike-btn" data-id="${
+    propuesta._id
+  }">
+              <i class="bi bi-hand-thumbs-down"></i>
+              <span class="dislikes-count">${propuesta.dislikes || 0}</span>
+            </button>
+            <button class="btn btn-outline-warning save-btn" data-id="${
+              propuesta._id
+            }" title="Guardar">
+              <i class="bi bi-bookmark"></i>
+            </button>
+          </div>
           ${adminControls}
         </div>
       </div>
@@ -69,12 +95,142 @@ function crearCard(propuesta) {
   `;
 
   cardDiv.innerHTML = card;
-
-  // Add event listeners
-  cardDiv.querySelector(".edit-btn").addEventListener("click", handleEdit);
-  cardDiv.querySelector(".delete-btn")?.addEventListener("click", handleDelete);
-
+  addCardEventListeners(cardDiv);
   return cardDiv;
+}
+
+function addCardEventListeners(cardDiv, isAdmin) {
+  const likeBtn = cardDiv.querySelector(".like-btn");
+  const dislikeBtn = cardDiv.querySelector(".dislike-btn");
+
+  likeBtn.addEventListener("click", async (e) => {
+    const button = e.currentTarget;
+    button.disabled = true;
+    try {
+      const response = await fetch(
+        `${API_URL}/api/propuesta/${button.dataset.id}/like`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+        }
+      );
+      const result = await response.json();
+
+      if (response.ok && result.success && result.data) {
+        // Actualiza los contadores con los valores del backend
+        const likesCount = button.querySelector(".likes-count");
+        const dislikesCount = dislikeBtn.querySelector(".dislikes-count");
+        likesCount.textContent = result.data.likes;
+        dislikesCount.textContent = result.data.dislikes;
+
+        // Estado visual: solo uno activo
+        if (result.data.userLike) {
+          button.classList.add("active", "btn-success");
+          button.classList.remove("btn-outline-success");
+        } else {
+          button.classList.remove("active", "btn-success");
+          button.classList.add("btn-outline-success");
+        }
+
+        if (result.data.userDislike) {
+          dislikeBtn.classList.add("active", "btn-danger");
+          dislikeBtn.classList.remove("btn-outline-danger");
+        } else {
+          dislikeBtn.classList.remove("active", "btn-danger");
+          dislikeBtn.classList.add("btn-outline-danger");
+        }
+      } else {
+        showMessage(result.message || "Error al procesar la acción", true);
+      }
+    } catch (error) {
+      showMessage("Error al procesar la acción", true);
+    } finally {
+      button.disabled = false;
+    }
+  });
+
+  dislikeBtn.addEventListener("click", async (e) => {
+    const button = e.currentTarget;
+    button.disabled = true;
+    try {
+      const response = await fetch(
+        `${API_URL}/api/propuesta/${button.dataset.id}/dislike`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+        }
+      );
+      const result = await response.json();
+
+      if (response.ok && result.success && result.data) {
+        const likesCount = likeBtn.querySelector(".likes-count");
+        const dislikesCount = button.querySelector(".dislikes-count");
+        likesCount.textContent = result.data.likes;
+        dislikesCount.textContent = result.data.dislikes;
+
+        if (result.data.userDislike) {
+          button.classList.add("active", "btn-danger");
+          button.classList.remove("btn-outline-danger");
+        } else {
+          button.classList.remove("active", "btn-danger");
+          button.classList.add("btn-outline-danger");
+        }
+
+        if (result.data.userLike) {
+          likeBtn.classList.add("active", "btn-success");
+          likeBtn.classList.remove("btn-outline-success");
+        } else {
+          likeBtn.classList.remove("active", "btn-success");
+          likeBtn.classList.add("btn-outline-success");
+        }
+      } else {
+        showMessage(result.message || "Error al procesar la acción", true);
+      }
+    } catch (error) {
+      showMessage("Error al procesar la acción", true);
+    } finally {
+      button.disabled = false;
+    }
+  });
+
+  const saveBtn = cardDiv.querySelector(".save-btn");
+  if (saveBtn) {
+    saveBtn.addEventListener("click", async (e) => {
+      // ...
+    });
+  }
+
+  cardDiv.querySelector(".save-btn").addEventListener("click", async (e) => {
+    const button = e.currentTarget;
+    const propuestaId = button.dataset.id;
+    try {
+      const response = await fetch(`/api/user/save/${propuestaId}`, {
+        method: "POST",
+        credentials: "include",
+      });
+      const result = await response.json();
+      if (result.success) {
+        if (result.action === "added") {
+          button.classList.remove("btn-outline-warning");
+          button.classList.add("btn-warning");
+          button.querySelector("i").classList.remove("bi-bookmark");
+          button.querySelector("i").classList.add("bi-bookmark-fill");
+        } else {
+          button.classList.remove("btn-warning");
+          button.classList.add("btn-outline-warning");
+          button.querySelector("i").classList.remove("bi-bookmark-fill");
+          button.querySelector("i").classList.add("bi-bookmark");
+        }
+      }
+    } catch (error) {
+      showMessage("Error al guardar propuesta", true);
+    }
+  });
+
+  cardDiv.querySelector(".edit-btn")?.addEventListener("click", handleEdit);
+  cardDiv.querySelector(".delete-btn")?.addEventListener("click", handleDelete);
 }
 
 async function handleEdit(e) {
@@ -178,11 +334,21 @@ async function handleDelete(e) {
 
 async function cargarPropuestas() {
   try {
-    const response = await fetch(`${API_URL}/api/propuesta?page=1&limit=1000`, {
+    let url = `${API_URL}/api/propuesta?page=1&limit=1000`;
+    if (currentUser && currentUser.id) {
+      url += `&userId=${currentUser.id}`;
+    }
+    const response = await fetch(url, {
       credentials: "include",
     });
     const data = await response.json();
+    console.log("Propuestas recibidas:", data); // <-- Para depuración
+
     const container = document.querySelector("#cards-container .row");
+    if (!container) {
+      console.error("No se encontró el contenedor de cards");
+      return;
+    }
     container.innerHTML = "";
 
     if (!data.items || data.items.length === 0) {
@@ -196,8 +362,11 @@ async function cargarPropuestas() {
     });
   } catch (error) {
     const container = document.querySelector("#cards-container .row");
-    container.innerHTML =
-      '<div class="col-12 text-center text-danger">Error al cargar las propuestas</div>';
+    if (container) {
+      container.innerHTML =
+        '<div class="col-12 text-center text-danger">Error al cargar las propuestas</div>';
+    }
+    console.error("Error al cargar propuestas:", error);
   }
 }
 
@@ -205,3 +374,85 @@ document.addEventListener("DOMContentLoaded", async () => {
   await getCurrentUser();
   await cargarPropuestas();
 });
+
+const updateLikes = async (id, token, isLike = true) => {
+  try {
+    const decoded = decodeToken(token);
+    if (!decoded || !decoded.payload.id) {
+      throw new Error("Usuario no autorizado");
+    }
+
+    const userId = decoded.payload.id;
+    const updateField = isLike ? "likes" : "dislikes";
+    const oppositeField = isLike ? "dislikes" : "likes";
+
+    // Buscar interacción existente
+    const existingInteraction = await Interaction.findOne({
+      userId,
+      propuestaId: id,
+    });
+
+    let userLike = false;
+    let userDislike = false;
+
+    if (existingInteraction) {
+      if (
+        (isLike && existingInteraction.type === "like") ||
+        (!isLike && existingInteraction.type === "dislike")
+      ) {
+        // Si ya existe la misma interacción, quitarla (toggle)
+        await Propuesta.findByIdAndUpdate(id, {
+          $inc: { [updateField]: -1 },
+        });
+        await existingInteraction.deleteOne();
+      } else {
+        // Cambiar de like a dislike o viceversa
+        await Propuesta.findByIdAndUpdate(id, {
+          $inc: { [updateField]: 1, [oppositeField]: -1 },
+        });
+        existingInteraction.type = isLike ? "like" : "dislike";
+        await existingInteraction.save();
+      }
+    } else {
+      // Crear nueva interacción
+      await Interaction.create({
+        userId,
+        propuestaId: id,
+        type: isLike ? "like" : "dislike",
+      });
+      await Propuesta.findByIdAndUpdate(id, {
+        $inc: { [updateField]: 1 },
+      });
+    }
+
+    // Obtener el estado actualizado
+    const propuesta = await Propuesta.findById(id).lean();
+    const userInteraction = await Interaction.findOne({
+      userId,
+      propuestaId: id,
+    });
+
+    if (userInteraction) {
+      userLike = userInteraction.type === "like";
+      userDislike = userInteraction.type === "dislike";
+    }
+
+    return {
+      success: true,
+      data: {
+        likes: propuesta.likes,
+        dislikes: propuesta.dislikes,
+        userLike,
+        userDislike,
+      },
+    };
+  } catch (error) {
+    console.error(
+      `Error al actualizar ${isLike ? "likes" : "dislikes"}: `,
+      error
+    );
+    return { success: false, message: error.message };
+  }
+};
+
+const container = document.querySelector("#cards-container .row");
