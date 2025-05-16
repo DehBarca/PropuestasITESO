@@ -1,7 +1,5 @@
 import jwtDecode from "https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.esm.js";
 
-const API_URL = "http://localhost:8080";
-
 async function cargarLikes() {
   try {
     const cookies = document.cookie.split("; ").reduce((acc, cookie) => {
@@ -19,7 +17,7 @@ async function cargarLikes() {
     const decoded = jwtDecode(token);
     const userId = decoded.id;
 
-    const response = await fetch(`${API_URL}/api/propuesta?userId=${userId}`, {
+    const response = await fetch(`/api/propuesta?userId=${userId}`, {
       method: "GET",
       credentials: "include",
     });
@@ -104,7 +102,7 @@ function crearCard(propuesta, onRemove) {
 
 async function cargarGuardados() {
   try {
-    const response = await fetch(`${API_URL}/api/user/saved`, {
+    const response = await fetch(`/api/user/saved`, {
       credentials: "include",
     });
     const data = await response.json();
@@ -132,7 +130,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const container = document.querySelector(".row.mt-4");
 
   try {
-    const res = await fetch("/api/user/saved", {
+    const res = await fetch(`/api/user/saved`, {
       credentials: "include",
     });
     const data = await res.json();

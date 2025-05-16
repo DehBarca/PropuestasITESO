@@ -1,8 +1,6 @@
-const API_URL = "http://localhost:8080";
-
 document.getElementById("logoutBtn").addEventListener("click", async () => {
   try {
-    const response = await fetch(`${API_URL}/api/auth/logout`, {
+    const response = await fetch(`/api/auth/logout`, {
       method: "POST",
       credentials: "include",
     });

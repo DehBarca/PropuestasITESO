@@ -1,5 +1,3 @@
-const API_URL = "http://localhost:8080";
-
 function showHideLoader(show, hide) {
   show.style.display = "block";
   hide.style.display = "none";
@@ -17,7 +15,7 @@ function showMessage(message, isError = false) {
 
 const registrarse = async (nombre, email, password) => {
   try {
-    const response = await fetch(`${API_URL}/api/user`, {
+    const response = await fetch(`/api/user`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

@@ -1,5 +1,3 @@
-const API_URL = "http://localhost:8080";
-
 let currentUser = null;
 let paginaActual = 1;
 let totalPaginas = 1;
@@ -124,14 +122,11 @@ function addCardEventListeners(cardDiv, isAdmin) {
     const button = e.currentTarget;
     button.disabled = true;
     try {
-      const response = await fetch(
-        `${API_URL}/api/propuesta/${button.dataset.id}/like`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-        }
-      );
+      const response = await fetch(`/api/propuesta/${button.dataset.id}/like`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+      });
       const result = await response.json();
 
       if (response.ok && result.success && result.data) {
@@ -172,7 +167,7 @@ function addCardEventListeners(cardDiv, isAdmin) {
     button.disabled = true;
     try {
       const response = await fetch(
-        `${API_URL}/api/propuesta/${button.dataset.id}/dislike`,
+        `/api/propuesta/${button.dataset.id}/dislike`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -280,7 +275,7 @@ async function handleDelete(e) {
   const id = btn.dataset.id;
   if (confirm("¿Estás seguro de que quieres eliminar esta propuesta?")) {
     try {
-      const response = await fetch(`${API_URL}/api/propuesta/${id}`, {
+      const response = await fetch(`/api/propuesta/${id}`, {
         method: "DELETE",
         credentials: "include",
       });
@@ -311,7 +306,7 @@ async function handleDelete(e) {
 
 async function cargarPropuestas(pagina = 1, searchTerm = "") {
   try {
-    let url = `${API_URL}/api/propuesta?page=${pagina}&limit=6&search=${encodeURIComponent(
+    let url = `/api/propuesta?page=${pagina}&limit=6&search=${encodeURIComponent(
       searchTerm
     )}`;
     if (currentUser && currentUser.id) {

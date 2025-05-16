@@ -1,7 +1,6 @@
 import { getPageNumber, actualizarURL } from "./utils.js";
 
 const limite = 6;
-const API_URL = "http://localhost:8080";
 
 let currentUser = null;
 
@@ -146,14 +145,11 @@ function addCardEventListeners(cardDiv, canEdit) {
     const button = e.currentTarget;
     button.disabled = true;
     try {
-      const response = await fetch(
-        `${API_URL}/api/propuesta/${button.dataset.id}/like`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-        }
-      );
+      const response = await fetch(`/api/propuesta/${button.dataset.id}/like`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+      });
       const result = await response.json();
 
       if (response.ok && result.success && result.data) {
@@ -194,7 +190,7 @@ function addCardEventListeners(cardDiv, canEdit) {
     button.disabled = true;
     try {
       const response = await fetch(
-        `${API_URL}/api/propuesta/${button.dataset.id}/dislike`,
+        `/api/propuesta/${button.dataset.id}/dislike`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -316,7 +312,7 @@ async function handleEdit(e) {
   };
 
   try {
-    const response = await fetch(`${API_URL}/api/propuesta/${id}`, {
+    const response = await fetch(`/api/propuesta/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -350,7 +346,7 @@ async function handleDelete(e) {
 
   if (confirm("¿Estás seguro de que quieres eliminar esta propuesta?")) {
     try {
-      const response = await fetch(`${API_URL}/api/propuesta/${id}`, {
+      const response = await fetch(`/api/propuesta/${id}`, {
         method: "DELETE",
         credentials: "include",
       });
@@ -383,7 +379,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const cargarPropuestas = async (paginaActual = 1, searchTerm = "") => {
     try {
       const response = await fetch(
-        `${API_URL}/api/propuesta?page=${paginaActual}&limit=6&search=${encodeURIComponent(
+        `/api/propuesta?page=${paginaActual}&limit=6&search=${encodeURIComponent(
           searchTerm
         )}`,
         {

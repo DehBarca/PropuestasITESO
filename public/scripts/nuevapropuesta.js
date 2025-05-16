@@ -58,7 +58,7 @@ document
     };
 
     try {
-      const res = await fetch("/api/propuesta", {
+      const res = await fetch(`/api/propuesta`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

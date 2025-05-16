@@ -1,7 +1,5 @@
 import jwtDecode from "https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.esm.js";
 
-const API_URL = "http://localhost:8080";
-
 async function cargarPerfil() {
   try {
     // 1. Obtener usuario autenticado
@@ -14,7 +12,7 @@ async function cargarPerfil() {
 
       // 2. Obtener publicaciones del usuario
       const propuestasRes = await fetch(
-        `${API_URL}/api/propuesta?autor=${data.user.id}`,
+        `/api/propuesta?autor=${data.user.id}`,
         {
           credentials: "include",
         }
@@ -23,8 +21,10 @@ async function cargarPerfil() {
 
       // 3. Obtener número de comentarios en las propuestas del usuario
       const comentariosRes = await fetch(
-        `${API_URL}/api/propuesta/estadisticas/${data.user.id}/comentarios`,
-        { credentials: "include" }
+        `/api/propuesta/estadisticas/${data.user.id}/comentarios`,
+        {
+          credentials: "include",
+        }
       );
       const comentariosData = await comentariosRes.json();
       const comentariosEnPropuestas = comentariosData.totalComentarios || 0;

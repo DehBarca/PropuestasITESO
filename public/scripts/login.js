@@ -1,5 +1,3 @@
-const API_URL = "http://localhost:8080";
-
 function showHideLoader(show, hide) {
   show.style.display = "block";
   hide.style.display = "none";
@@ -17,7 +15,7 @@ function showMessage(message, isError = false) {
 
 const login = async (email, password) => {
   try {
-    const response = await fetch(`${API_URL}/api/auth/login`, {
+    const response = await fetch(`/api/auth/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

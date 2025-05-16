@@ -50,7 +50,14 @@ app.get(["/registro", "/registro.html"], (req, res) => {
   res.sendFile(join(__dirname, "public/views/registro.html"));
 });
 
-app.get("/", checkAuth, (req, res) => {
+app.get("/", (req, res) => {
+  const token = req.cookies.jwt; // Verifica si hay un token JWT en las cookies
+  if (!token) {
+    // Si no hay token, redirige a Home.html
+    return res.redirect("/home.html");
+  }
+
+  // Si hay token, verifica el rol del usuario
   const { role } = req.headers;
   if (role === "admin") {
     res.redirect("/home.admin.html");
