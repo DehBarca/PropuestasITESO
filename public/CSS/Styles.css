@@ -112,3 +112,28 @@
 #cards-container {
     margin-top: 80px;
 }
+
+.card-img-top,
+.card img,
+.card-light img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  object-position: center;
+}
+
+/* Imagen de perfil grande y centrada */
+.perfil-icono {
+  width: 120px;
+  height: 120px;
+  background: #e3eaf6;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 64px;
+  color: #00467F;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  margin: 0 auto 16px auto;
+  border: 3px solid #b3c6e6;
+}

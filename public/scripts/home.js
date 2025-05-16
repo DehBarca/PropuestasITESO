@@ -134,6 +134,7 @@ function addCardEventListeners(cardDiv, canEdit) {
   const likeBtn = cardDiv.querySelector(".like-btn");
   const dislikeBtn = cardDiv.querySelector(".dislike-btn");
   const saveBtn = cardDiv.querySelector(".save-btn");
+  const commentBtn = cardDiv.querySelector(".comment-btn");
 
   // LIKE
   likeBtn.addEventListener("click", async (e) => {
@@ -259,9 +260,20 @@ function addCardEventListeners(cardDiv, canEdit) {
     });
   }
 
+  // COMENTARIOS
+  if (commentBtn) {
+    commentBtn.addEventListener("click", (e) => {
+      const propuestaId = commentBtn.dataset.id;
+      window.location.href = `comentarios.html?id=${propuestaId}`;
+    });
+  }
+
   // Admin controls
   if (canEdit) {
-    cardDiv.querySelector(".edit-btn")?.addEventListener("click", handleEdit);
+    cardDiv.querySelector(".edit-btn")?.addEventListener("click", (e) => {
+      const id = e.currentTarget.dataset.id;
+      window.location.href = `editarpropuesta.html?id=${id}`;
+    });
     cardDiv
       .querySelector(".delete-btn")
       ?.addEventListener("click", handleDelete);

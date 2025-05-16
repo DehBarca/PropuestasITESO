@@ -2,6 +2,7 @@ import express from "express";
 import PropuestaService from "../service/propuestas.service.js";
 import { checkAuth } from "../middlewares/is.authenticated.js";
 import { decodeToken } from "../utils/jwt.js";
+import Comentario from "../database/entities/comentario.js";
 
 const router = express.Router();
 const service = new PropuestaService();
@@ -181,6 +182,54 @@ router.get("/saved", checkAuth, async (req, res) => {
     res.json({ success: true, saved: user.saved });
   } catch (error) {
     console.error("Error en /saved:", error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// Obtener comentarios de una propuesta
+router.get("/:id/comentarios", async (req, res) => {
+  try {
+    const comentarios = await Comentario.find({ propuesta: req.params.id })
+      .populate("autor", "user email")
+      .sort({ createdAt: 1 });
+    res.json({ success: true, comentarios });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// Agregar comentario a una propuesta
+router.post("/:id/comentarios", checkAuth, async (req, res) => {
+  try {
+    const token = req.cookies.jwt;
+    const { payload } = decodeToken(token);
+    const userId = payload.id;
+    const { texto } = req.body;
+    if (!texto) return res.status(400).json({ success: false, message: "Texto requerido" });
+
+    const nuevoComentario = await Comentario.create({
+      propuesta: req.params.id,
+      autor: userId,
+      texto,
+    });
+    await nuevoComentario.populate("autor", "user email");
+    res.json({ success: true, comentario: nuevoComentario });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// Obtener número de comentarios en las propuestas de un usuario
+router.get("/estadisticas/:userId/comentarios", async (req, res) => {
+  try {
+    // Busca todas las propuestas del usuario
+    const propuestas = await service.getPropuestas(null, null, null, null, req.params.userId);
+    const propuestasIds = propuestas.items.map(p => p._id);
+
+    // Cuenta los comentarios en esas propuestas
+    const totalComentarios = await Comentario.countDocuments({ propuesta: { $in: propuestasIds } });
+    res.json({ success: true, totalComentarios });
+  } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
 });

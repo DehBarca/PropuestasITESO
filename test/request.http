@@ -62,7 +62,7 @@ Content-Type: application/json
 {
     "user": "Admin",
     "role": "admin",
-    "email": "admin1@test.com",
+    "email": "admin2@test.com",
     "password": "admin"
 }
 
@@ -80,4 +80,4 @@ Content-Type: application/json
 
 ###
 // Eliminar usuario por ID
-DELETE http://127.0.0.1:8080/api/user/682531d1c7f1b6e0a3f4653f HTTP/1.1
+DELETE http://127.0.0.1:8080/api/user/68253bc8e1812e2bf2cf39fe HTTP/1.1
