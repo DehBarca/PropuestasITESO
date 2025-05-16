@@ -205,7 +205,10 @@ router.post("/:id/comentarios", checkAuth, async (req, res) => {
     const { payload } = decodeToken(token);
     const userId = payload.id;
     const { texto } = req.body;
-    if (!texto) return res.status(400).json({ success: false, message: "Texto requerido" });
+    if (!texto)
+      return res
+        .status(400)
+        .json({ success: false, message: "Texto requerido" });
 
     const nuevoComentario = await Comentario.create({
       propuesta: req.params.id,
@@ -223,14 +226,50 @@ router.post("/:id/comentarios", checkAuth, async (req, res) => {
 router.get("/estadisticas/:userId/comentarios", async (req, res) => {
   try {
     // Busca todas las propuestas del usuario
-    const propuestas = await service.getPropuestas(null, null, null, null, req.params.userId);
-    const propuestasIds = propuestas.items.map(p => p._id);
+    const propuestas = await service.getPropuestas(
+      null,
+      null,
+      null,
+      null,
+      req.params.userId
+    );
+    const propuestasIds = propuestas.items.map((p) => p._id);
 
     // Cuenta los comentarios en esas propuestas
-    const totalComentarios = await Comentario.countDocuments({ propuesta: { $in: propuestasIds } });
+    const totalComentarios = await Comentario.countDocuments({
+      propuesta: { $in: propuestasIds },
+    });
     res.json({ success: true, totalComentarios });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// Eliminar comentario
+router.delete("/comentario/:id", checkAuth, async (req, res) => {
+  try {
+    const comentarioId = req.params.id;
+
+    const comentario = await Comentario.findById(comentarioId);
+    if (!comentario) {
+      return res.status(404).json({ message: "Comentario no encontrado" });
+    }
+
+    const userId = req.user.id;
+    const esAutorComentario = comentario.autor.toString() === userId;
+    const esAdmin = req.user.role === "admin";
+
+    if (!esAutorComentario && !esAdmin) {
+      return res.status(403).json({ message: "No autorizado" });
+    }
+
+    await comentario.deleteOne();
+    res.status(200).json({ success: true, message: "Comentario eliminado" });
+  } catch (error) {
+    console.error("Error al eliminar comentario:", error);
+    res
+      .status(500)
+      .json({ success: false, message: "Error interno del servidor" });
   }
 });
 

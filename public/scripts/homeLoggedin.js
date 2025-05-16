@@ -49,3 +49,73 @@ function addCardEventListeners(cardDiv, isAdmin) {
     });
   }
 }
+
+function crearCard(propuesta) {
+  const cardDiv = document.createElement("div");
+  cardDiv.className = "col-md-4 mb-4";
+
+  const autorNombre =
+    propuesta.autor && propuesta.autor.user
+      ? propuesta.autor.user
+      : "Autor desconocido";
+
+  const card = `
+    <div class="card h-100">
+      <a href="comentarios.html?id=${propuesta._id}">
+        <img src="${propuesta.img || "https://via.placeholder.com/150"}" 
+             class="card-img-top" 
+             alt="${propuesta.title}">
+      </a>
+      <div class="card-body d-flex flex-column">
+        <a href="comentarios.html?id=${
+          propuesta._id
+        }" class="text-decoration-none text-dark">
+          <h5 class="card-title">${propuesta.title}</h5>
+        </a>
+        <div class="mb-2">
+          ${propuesta.category
+            .map(
+              (cat) =>
+                `<button class="btn btn-primary btn-sm card-category me-1 mb-1" disabled>${cat}</button>`
+            )
+            .join("")}
+        </div>
+        <p class="card-text">${propuesta.descripcion}</p>
+        <p class="card-text text-muted mb-1"><small>Autor: ${autorNombre}</small></p>
+        <div class="mt-auto">
+          <div class="d-flex justify-content-between align-items-center">
+            <button class="btn btn-outline-success like-btn" data-id="${
+              propuesta._id
+            }">
+              <i class="bi bi-hand-thumbs-up"></i> 
+              <span class="likes-count">${propuesta.likes || 0}</span>
+            </button>
+            <button class="btn btn-outline-danger dislike-btn" data-id="${
+              propuesta._id
+            }">
+              <i class="bi bi-hand-thumbs-down"></i>
+              <span class="dislikes-count">${propuesta.dislikes || 0}</span>
+            </button>
+            <button class="btn btn-outline-primary comment-btn" data-id="${
+              propuesta._id
+            }">
+              <i class="bi bi-chat"></i> Comentar
+            </button>
+            <button class="btn btn-outline-warning save-btn" data-id="${
+              propuesta._id
+            }" title="Guardar">
+              <i class="bi bi-bookmark"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  cardDiv.innerHTML = card;
+
+  // Add event listeners
+  addCardEventListeners(cardDiv, false);
+
+  return cardDiv;
+}

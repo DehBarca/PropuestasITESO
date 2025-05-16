@@ -4,6 +4,7 @@ import Config from "./src/config/config.js";
 import propuestaRouter from "./src/routes/propuesta.routes.js";
 import userRouter from "./src/routes/user.routes.js";
 import { authRouter } from "./src/routes/auth.router.js";
+import comentarioRouter from "./src/routes/comentario.routes.js"; // Importa el router de comentarios
 import cookieParser from "cookie-parser";
 import { checkAuth } from "./src/middlewares/is.authenticated.js";
 import { fileURLToPath } from "url";
@@ -39,6 +40,7 @@ app.use(express.static(join(__dirname, "public")));
 app.use("/api/propuesta", propuestaRouter);
 app.use("/api/user", userRouter);
 app.use("/api/auth", authRouter);
+app.use("/api/comentario", comentarioRouter); // Agrega esta línea para registrar el router
 
 app.get(["/login", "/login.html"], (req, res) => {
   res.sendFile(join(__dirname, "public/views/login.html"));

@@ -55,7 +55,6 @@ function crearCard(propuesta) {
       ? propuesta.autor.user
       : "Autor desconocido";
 
-  // Mostrar controles solo si admin o autor
   const isAdmin = currentUser && currentUser.role === "admin";
   const isOwner =
     currentUser && propuesta.autor && propuesta.autor._id === currentUser.id;
@@ -76,11 +75,17 @@ function crearCard(propuesta) {
 
   const card = `
     <div class="card h-100">
-      <img src="${propuesta.img || "https://via.placeholder.com/150"}" 
-           class="card-img-top" 
-           alt="${propuesta.title}">
+      <a href="comentarios.html?id=${propuesta._id}">
+        <img src="${propuesta.img || "https://via.placeholder.com/150"}" 
+             class="card-img-top" 
+             alt="${propuesta.title}">
+      </a>
       <div class="card-body d-flex flex-column">
-        <h5 class="card-title">${propuesta.title}</h5>
+        <a href="comentarios.html?id=${
+          propuesta._id
+        }" class="text-decoration-none text-dark">
+          <h5 class="card-title">${propuesta.title}</h5>
+        </a>
         <div class="mb-2">
           ${propuesta.category
             .map(

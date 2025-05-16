@@ -2,18 +2,15 @@ import mongoose from "mongoose";
 
 const ComentarioSchema = new mongoose.Schema(
   {
-    propuesta: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Propuesta",
-      required: true,
-    },
+    texto: { type: String, required: true },
     autor: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
     },
-    texto: {
-      type: String,
+    propuesta: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Propuesta",
       required: true,
     },
   },

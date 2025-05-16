@@ -36,7 +36,13 @@ function crearCard(propuesta) {
       ? propuesta.autor.user
       : "Autor desconocido";
 
-  const adminControls = `
+  const isAdmin = currentUser && currentUser.role === "admin";
+  const isOwner =
+    currentUser && propuesta.autor && propuesta.autor._id === currentUser.id;
+
+  const adminControls =
+    isAdmin || isOwner
+      ? `
     <div class="mt-2 d-flex justify-content-between">
       <button class="btn btn-warning btn-sm edit-btn" data-id="${propuesta._id}">
         <i class="bi bi-pencil"></i> Editar
@@ -45,22 +51,22 @@ function crearCard(propuesta) {
         <i class="bi bi-trash"></i> Eliminar
       </button>
     </div>
-  `;
-
-  const likeActive = propuesta.userLike
-    ? "active btn-success"
-    : "btn-outline-success";
-  const dislikeActive = propuesta.userDislike
-    ? "active btn-danger"
-    : "btn-outline-danger";
+  `
+      : "";
 
   const card = `
     <div class="card h-100">
-      <img src="${propuesta.img || "https://via.placeholder.com/150"}" 
-           class="card-img-top" 
-           alt="${propuesta.title}">
+      <a href="comentarios.html?id=${propuesta._id}">
+        <img src="${propuesta.img || "https://via.placeholder.com/150"}" 
+             class="card-img-top" 
+             alt="${propuesta.title}">
+      </a>
       <div class="card-body d-flex flex-column">
-        <h5 class="card-title">${propuesta.title}</h5>
+        <a href="comentarios.html?id=${
+          propuesta._id
+        }" class="text-decoration-none text-dark">
+          <h5 class="card-title">${propuesta.title}</h5>
+        </a>
         <div class="mb-2">
           ${propuesta.category
             .map(
@@ -73,17 +79,22 @@ function crearCard(propuesta) {
         <p class="card-text text-muted mb-1"><small>Autor: ${autorNombre}</small></p>
         <div class="mt-auto">
           <div class="d-flex justify-content-between align-items-center">
-            <button class="btn ${likeActive} like-btn" data-id="${
-    propuesta._id
-  }">
+            <button class="btn btn-outline-success like-btn" data-id="${
+              propuesta._id
+            }">
               <i class="bi bi-hand-thumbs-up"></i> 
               <span class="likes-count">${propuesta.likes || 0}</span>
             </button>
-            <button class="btn ${dislikeActive} dislike-btn" data-id="${
-    propuesta._id
-  }">
+            <button class="btn btn-outline-danger dislike-btn" data-id="${
+              propuesta._id
+            }">
               <i class="bi bi-hand-thumbs-down"></i>
               <span class="dislikes-count">${propuesta.dislikes || 0}</span>
+            </button>
+            <button class="btn btn-outline-primary comment-btn" data-id="${
+              propuesta._id
+            }">
+              <i class="bi bi-chat"></i> Comentar
             </button>
             <button class="btn btn-outline-warning save-btn" data-id="${
               propuesta._id
@@ -98,7 +109,10 @@ function crearCard(propuesta) {
   `;
 
   cardDiv.innerHTML = card;
-  addCardEventListeners(cardDiv);
+
+  // Add event listeners
+  addCardEventListeners(cardDiv, isAdmin || isOwner);
+
   return cardDiv;
 }
 
@@ -232,67 +246,27 @@ function addCardEventListeners(cardDiv, isAdmin) {
     }
   });
 
+  const commentBtn = cardDiv.querySelector(".comment-btn");
+  if (commentBtn) {
+    commentBtn.addEventListener("click", (e) => {
+      const propuestaId = commentBtn.dataset.id;
+      window.location.href = `comentarios.html?id=${propuestaId}`;
+    });
+  }
+
   cardDiv.querySelector(".edit-btn")?.addEventListener("click", handleEdit);
   cardDiv.querySelector(".delete-btn")?.addEventListener("click", handleDelete);
 }
 
 async function handleEdit(e) {
   const id = e.currentTarget.dataset.id;
-  // Busca la propuesta actual en el DOM
-  const card = e.currentTarget.closest(".col-md-4");
-  const title = card.querySelector(".card-title").textContent;
-  const descripcion = card.querySelector(".card-text").textContent;
-  const img = card.querySelector(".card-img-top").src;
-  const category = Array.from(card.querySelectorAll(".card-category")).map(
-    (btn) => btn.textContent
-  );
-
-  // Modal simple usando prompt (puedes reemplazar por un modal de Bootstrap)
-  const newTitle = prompt("Editar título:", title);
-  if (newTitle === null) return;
-  const newDescripcion = prompt("Editar descripción:", descripcion);
-  if (newDescripcion === null) return;
-  const newCategory = prompt(
-    "Editar categorías (separadas por coma):",
-    category.join(", ")
-  );
-  if (newCategory === null) return;
-  const newImg = prompt("Editar URL de imagen:", img);
-  if (newImg === null) return;
-
-  const updated = {
-    title: newTitle,
-    descripcion: newDescripcion,
-    category: newCategory.split(",").map((s) => s.trim()),
-    img: newImg,
-  };
-
-  try {
-    const response = await fetch(`/api/propuesta/${id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify(updated),
-    });
-    if (response.ok) {
-      // Actualiza la card en el DOM
-      card.querySelector(".card-title").textContent = updated.title;
-      card.querySelector(".card-text").textContent = updated.descripcion;
-      card.querySelector(".card-img-top").src = updated.img;
-      const catDiv = card.querySelector(".mb-2");
-      catDiv.innerHTML = updated.category
-        .map(
-          (cat) =>
-            `<button class="btn btn-primary btn-sm card-category me-1 mb-1" disabled>${cat}</button>`
-        )
-        .join("");
-      showMessage("Propuesta actualizada exitosamente");
-    } else {
-      showMessage("Error al actualizar la propuesta", true);
-    }
-  } catch (error) {
-    showMessage("Error al actualizar la propuesta", true);
+  if (!id) {
+    showMessage("Error: No se encontró el ID de la propuesta", true);
+    return;
   }
+
+  // Redirige a la página de edición con el ID de la propuesta
+  window.location.href = `editarpropuesta.html?id=${id}`;
 }
 
 async function handleDelete(e) {
