@@ -11,11 +11,20 @@ async function cargarLikes() {
 
     if (!token) {
       console.error("No se encontró el token JWT.");
+      window.location.href = "/login.html";
       return;
     }
 
-    const decoded = jwtDecode(token);
-    const userId = decoded.id;
+    let userId;
+    try {
+      const decoded = jwtDecode(token);
+      userId = decoded.id;
+      if (!userId) throw new Error("El token no contiene un ID de usuario.");
+    } catch (error) {
+      console.error("Error al decodificar el token JWT:", error);
+      window.location.href = "/login.html";
+      return;
+    }
 
     const response = await fetch(`/api/propuesta?userId=${userId}`, {
       method: "GET",
@@ -23,14 +32,17 @@ async function cargarLikes() {
     });
 
     if (!response.ok) {
-      throw new Error("Error al cargar las propuestas guardadas.");
+      const errorMessage = await response.text();
+      throw new Error(
+        `Error al cargar las propuestas guardadas: ${errorMessage}`
+      );
     }
 
     const propuestas = await response.json();
     const container = document.querySelector(".row");
     container.innerHTML = "";
 
-    if (propuestas.length === 0) {
+    if (!Array.isArray(propuestas) || propuestas.length === 0) {
       container.innerHTML =
         '<div class="col-12 text-center">No tienes propuestas guardadas o con "like".</div>';
       return;
@@ -81,16 +93,25 @@ function crearCard(propuesta, onRemove) {
 
   // Evento para quitar de guardados
   cardDiv.querySelector(".save-btn").addEventListener("click", async (e) => {
-    const propuestaId = propuesta._id;
+    if (!propuesta._id) {
+      console.error("La propuesta no tiene un ID válido.");
+      return;
+    }
+
     try {
-      const response = await fetch(`/api/user/save/${propuestaId}`, {
+      const response = await fetch(`/api/user/save/${propuesta._id}`, {
         method: "POST",
         credentials: "include",
       });
       const result = await response.json();
-      if (result.success && result.action === "removed") {
+      if (response.ok && result.success && result.action === "removed") {
         cardDiv.remove();
         if (onRemove) onRemove();
+      } else {
+        console.error(
+          "Error al quitar de guardados:",
+          result.message || "Error desconocido."
+        );
       }
     } catch (error) {
       console.error("Error al quitar de guardados:", error);
@@ -105,11 +126,17 @@ async function cargarGuardados() {
     const response = await fetch(`/api/user/saved`, {
       credentials: "include",
     });
+    if (!response.ok) {
+      throw new Error(`Error al cargar guardados: ${response.statusText}`);
+    }
     const data = await response.json();
+    if (!data.success || !Array.isArray(data.saved)) {
+      throw new Error(data.message || "Error desconocido al cargar guardados.");
+    }
     const container = document.querySelector("#cards-container .row");
     container.innerHTML = "";
 
-    if (!data.success || !data.saved || data.saved.length === 0) {
+    if (data.saved.length === 0) {
       container.innerHTML =
         '<div class="col-12 text-center">No tienes propuestas guardadas.</div>';
       return;
@@ -128,13 +155,22 @@ async function cargarGuardados() {
 
 document.addEventListener("DOMContentLoaded", async () => {
   const container = document.querySelector(".row.mt-4");
-
+  if (!container) {
+    console.error(
+      "No se encontró el contenedor para las propuestas guardadas."
+    );
+    return;
+  }
   try {
     const res = await fetch(`/api/user/saved`, {
       credentials: "include",
     });
+    if (!res.ok) {
+      throw new Error(
+        `Error al cargar propuestas guardadas: ${res.statusText}`
+      );
+    }
     const data = await res.json();
-
     if (
       !data.success ||
       !Array.isArray(data.saved) ||
@@ -143,12 +179,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       container.innerHTML = `<p class="text-center text-muted">No tienes propuestas guardadas.</p>`;
       return;
     }
-
     container.innerHTML = ""; // Limpiar el contenedor
-
     data.saved.forEach((propuesta) => {
       const card = crearCard(propuesta, () => {
-        // Si ya no quedan cards, muestra mensaje
         if (container.children.length === 0) {
           container.innerHTML = `<p class="text-center text-muted">No tienes propuestas guardadas.</p>`;
         }
