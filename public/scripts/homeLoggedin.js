@@ -16,6 +16,19 @@ document.getElementById("logoutBtn").addEventListener("click", async () => {
   }
 });
 
+async function getCurrentUser() {
+  try {
+    const res = await fetch("/api/user/me", { credentials: "include" });
+    const data = await res.json();
+    if (data.success && data.user) {
+      return data.user; // Devuelve el usuario actual
+    }
+  } catch (error) {
+    console.error("Error al obtener el usuario actual:", error);
+  }
+  return null;
+}
+
 function addCardEventListeners(cardDiv, isAdmin) {
   // ...otros listeners...
 
@@ -50,7 +63,7 @@ function addCardEventListeners(cardDiv, isAdmin) {
   }
 }
 
-function crearCard(propuesta) {
+function crearCard(propuesta, currentUser) {
   const cardDiv = document.createElement("div");
   cardDiv.className = "col-md-4 mb-4";
 
@@ -58,6 +71,22 @@ function crearCard(propuesta) {
     propuesta.autor && propuesta.autor.user
       ? propuesta.autor.user
       : "Autor desconocido";
+
+  const isOwner =
+    currentUser && propuesta.autor && propuesta.autor._id === currentUser.id;
+
+  const ownerControls = isOwner
+    ? `
+      <div class="mt-2 d-flex justify-content-between">
+        <button class="btn btn-warning btn-sm edit-btn" data-id="${propuesta._id}">
+          <i class="bi bi-pencil"></i> Editar
+        </button>
+        <button class="btn btn-danger btn-sm delete-btn" data-id="${propuesta._id}">
+          <i class="bi bi-trash"></i> Eliminar
+        </button>
+      </div>
+    `
+    : "";
 
   const card = `
     <div class="card h-100">
@@ -107,6 +136,7 @@ function crearCard(propuesta) {
               <i class="bi bi-bookmark"></i>
             </button>
           </div>
+          ${ownerControls}
         </div>
       </div>
     </div>
@@ -114,8 +144,11 @@ function crearCard(propuesta) {
 
   cardDiv.innerHTML = card;
 
-  // Add event listeners
-  addCardEventListeners(cardDiv, false);
+  addCardEventListeners(cardDiv, isOwner);
 
   return cardDiv;
 }
+
+document.addEventListener("DOMContentLoaded", async () => {
+  const currentUser = await getCurrentUser();
+});
