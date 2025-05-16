@@ -54,7 +54,7 @@ app.get("/", (req, res) => {
   const token = req.cookies.jwt; // Verifica si hay un token JWT en las cookies
   if (!token) {
     // Si no hay token, redirige a Home.html
-    return res.redirect("/home.html");
+    return res.redirect("/Home.html");
   }
 
   // Si hay token, verifica el rol del usuario
@@ -92,6 +92,10 @@ app.get(["/home.admin", "/home.admin.html"], checkAuth, (req, res) => {
     console.error(error);
     res.status(500).json({ status: 500, error: error.message });
   }
+});
+
+app.get("/Likes.html", (req, res) => {
+  res.sendFile(join(__dirname, "public/views/Likes.html"));
 });
 
 // Static HTML files route
