@@ -95,7 +95,12 @@ app.get(["/home.admin", "/home.admin.html"], checkAuth, (req, res) => {
 });
 
 app.get("/Likes.html", (req, res) => {
-  res.sendFile(join(__dirname, "public/views/Likes.html"));
+  res.sendFile(join(__dirname, "public/views/Likes.html"), (err) => {
+    if (err) {
+      console.error("Error al servir Likes.html:", err);
+      res.status(500).send("Internal Server Error");
+    }
+  });
 });
 
 app.get("/:page.html", (req, res, next) => {
