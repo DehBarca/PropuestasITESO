@@ -98,7 +98,6 @@ app.get("/Likes.html", (req, res) => {
   res.sendFile(join(__dirname, "public/views/Likes.html"));
 });
 
-// Static HTML files route
 app.get("/:page.html", (req, res, next) => {
   const page = req.params.page;
   const filePath = join(__dirname, `public/views/${page}.html`);
