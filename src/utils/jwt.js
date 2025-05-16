@@ -3,7 +3,6 @@ import jwt from "jsonwebtoken";
 export const crearToken = (claims) => {
   try {
     const token = jwt.sign(claims, Config.SECRET);
-    console.log(token);
     return token;
   } catch (error) {
     console.error("Error al firmar el jwt. Error: ", error);

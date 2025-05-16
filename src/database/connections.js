@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import Config from "../config/config.js";
 
 let isConnected = false;
 
@@ -7,10 +6,7 @@ export const dbConnect = async () => {
   if (isConnected) return;
 
   try {
-    await mongoose.connect(Config.DB_HOST, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+    await mongoose.connect(process.env.DB_HOST);
     isConnected = true;
     console.log("DB Connected successfully");
   } catch (error) {
